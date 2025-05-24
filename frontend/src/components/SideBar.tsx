@@ -40,7 +40,7 @@ export const SideBar = ({ shared, tweet, youtube, all }: SideBarProps) => {
             <div className={`w-full pr-6 pb-2 ${shared ? 'hidden' : null}`}>
                 <Button text="Logout" className="w-full justify-center" onClick={() => {
                     localStorage.removeItem('token')
-                    navigate('/signin')
+                    navigate('/')
                     toast.success("Logout successfully")
                 }} />
             </div>
