@@ -1,10 +1,10 @@
 import dotenv from 'dotenv';
 dotenv.config()
+import cors from "cors";
 import express from "express";
+import { FRONDEND_URL, PORT, verifyEnvironmentVariables } from './config';
 import { connectDB } from "./db/config";
-import { router } from "./routes";
-import cors from "cors"
-import { FRONDEND_URL, PORT } from './config';
+import { userRouter } from './routes/user';
 
 const app  = express();
 
@@ -14,11 +14,12 @@ app.use(cors({
     credentials:true
 }))
 app.use(express.json());
-app.use('/api/v1',router)
+app.use('/api/v1',userRouter)
 
 
 
 connectDB().then(()=>{
+    verifyEnvironmentVariables()
     app.listen(PORT || 3000,()=>{
         console.log("server is running");
     })

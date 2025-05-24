@@ -1,10 +1,9 @@
-import { Request, Response, Router } from "express";
-import { contentModel, linkModel, userModel } from "../db/db";
-import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../config";
+import { Request, Router } from "express";
 import { authMiddleware } from "../middleware";
+import { contentModel } from "../models/contentSchema";
+import { linkModel } from "../models/linkSchema"
 import { random } from "../utils";
-const router = Router();
+const contentRouter = Router();
 
 declare global {
     namespace Express {
@@ -14,44 +13,9 @@ declare global {
     }
 }
 
-router.post('/signup', async (req: Request, res: Response) => {
-    const { email, password } = req.body;
 
-    try {
-        await userModel.create({
-            email,
-            password
-        })
-        res.json({
-            message: "You are singup now signin"
-        })
-    } catch (error) {
-        console.error(error);
-        res.status(411).json({
-            message: "User allready exist"
-        });
-    }
-})
-router.post('/signin', async (req, res) => {
-    const { email, password } = req.body;
 
-    const userExist = await userModel.findOne({
-        email,
-        password
-    })
-    if (userExist) {
-        const token = jwt.sign({ id: userExist.id }, JWT_SECRET as string)
-        res.json({
-            token
-        })
-    } else {
-        res.status(411).json({
-            message: "Incorrect credentials"
-        });
-    }
-})
-
-router.post('/content', authMiddleware, async (req, res) => {
+contentRouter.post('/content', authMiddleware, async (req, res) => {
     const { link, title, type } = req.body;
     const userId = req.userId;
 
@@ -71,7 +35,7 @@ router.post('/content', authMiddleware, async (req, res) => {
     }
 })
 
-router.get('/content', authMiddleware, async (req, res) => {
+contentRouter.get('/content', authMiddleware, async (req, res) => {
     const userId = req.userId;
     try {
         const userContent = await contentModel.find({
@@ -88,7 +52,7 @@ router.get('/content', authMiddleware, async (req, res) => {
     }
 })
 
-router.delete('/content', authMiddleware, async (req, res) => {
+contentRouter.delete('/content', authMiddleware, async (req, res) => {
     const { contentId } = req.body;
     await contentModel.deleteOne({
         id: contentId,
@@ -97,7 +61,7 @@ router.delete('/content', authMiddleware, async (req, res) => {
     res.json({ message: "content deleted" })
 })
 
-router.post('/brain/share', authMiddleware, async (req: Request, res) => {
+contentRouter.post('/brain/share', authMiddleware, async (req: Request, res) => {
     const { share } = req.body;
     const userId = req.userId;
 
@@ -108,7 +72,7 @@ router.post('/brain/share', authMiddleware, async (req: Request, res) => {
 
         if (linkExist) {
             res.json({
-                hash:linkExist.hash
+                hash: linkExist.hash
             })
             return
         }
@@ -133,7 +97,7 @@ router.post('/brain/share', authMiddleware, async (req: Request, res) => {
     }
 })
 
-router.get('/brain/:sharelink', async (req: Request, res) => {
+contentRouter.get('/brain/:sharelink', async (req: Request, res) => {
     const hash = req.params.sharelink;
     try {
         const link = await linkModel.findOne({
@@ -161,4 +125,5 @@ router.get('/brain/:sharelink', async (req: Request, res) => {
     }
 })
 
-export { router }
+export { contentRouter };
+
