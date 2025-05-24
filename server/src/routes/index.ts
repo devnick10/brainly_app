@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { contentModel, linkModel, userModel } from "../db/db";
 import jwt from "jsonwebtoken";
-import { JWT_PASSWORD } from "../config";
+import { JWT_SECRET } from "../config";
 import { authMiddleware } from "../middleware";
 import { random } from "../utils";
 const router = Router();
@@ -40,7 +40,7 @@ router.post('/signin', async (req, res) => {
         password
     })
     if (userExist) {
-        const token = jwt.sign({ id: userExist.id }, JWT_PASSWORD)
+        const token = jwt.sign({ id: userExist.id }, JWT_SECRET as string)
         res.json({
             token
         })
