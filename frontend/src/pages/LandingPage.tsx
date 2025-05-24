@@ -1,6 +1,6 @@
 import { Brain, Share2, Youtube, Twitter ,ArrowRight, Zap } from "lucide-react"
 import { Link } from "react-router-dom"
-import { features, steps, techStack } from "../utils"
+import { features, steps, techStack } from "../utils/utils"
 
 export default function BrainlyLanding() {
 

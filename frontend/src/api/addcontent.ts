@@ -1,7 +1,5 @@
-interface ContentData {
-    title: string;
-    link: string;
-}
+import type { ContentData } from "../utils/types";
+
 
 export async function addContent(data: ContentData) {
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/v1/content`, {

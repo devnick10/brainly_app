@@ -9,17 +9,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { getContent } from "../api/content";
 import { createLink } from "../api/createLink";
 import toast from "react-hot-toast";
-export interface Content {
-  _id: string;
-  link: string;
-  title: string;
-  type: "twitter" | 'youtube';
-  tags: []
-  userId: {
-    _id: string;
-    email: string
-  }
-}
+import type { Content } from "../utils/types";
+
 
 export function Dashboard() {
   const [modelOpen, setModelOpen] = useState<boolean>(false)

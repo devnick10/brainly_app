@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { Card } from "../components/Card";
 import { SideBar } from "../components/SideBar";
 import { sharedBrain } from "../api/sharedBrain";
-import type { Content } from "./Dashboard";
+import type { Content } from "../utils/types";
 
 export function SharedDashboard() {
     const [contentdata, setContentData] = useState<Content[]>([]);

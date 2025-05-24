@@ -1,12 +1,8 @@
-import type React from "react"
 import { Brain } from "lucide-react"
 import {Link} from "react-router-dom"
+import type { AuthLayoutProps } from "../utils/types"
 
-interface AuthLayoutProps {
-  children: React.ReactNode
-  title: string
-  subtitle: string
-}
+
 
 export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
   return (
