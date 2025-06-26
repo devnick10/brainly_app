@@ -1,23 +1,16 @@
-import { Request, Router } from "express";
-import { authMiddleware } from "../middleware";
+import { Request, Response } from "express";
 import { contentModel } from "../models/contentSchema";
-import { linkModel } from "../models/linkSchema"
+import { linkModel } from "../models/linkSchema";
 import { random } from "../utils";
-const contentRouter = Router();
+import { ApiError } from "../middleware/errorHandler";
 
-declare global {
-    namespace Express {
-        export interface Request {
-            userId: string;
-        }
-    }
-}
-
-
-
-contentRouter.post('/content', authMiddleware, async (req, res) => {
+const createContent = async (req: Request, res: Response) => {
     const { link, title, type } = req.body;
     const userId = req.userId;
+    
+    if(!link || !title || !type){
+        throw new ApiError("All fields are required",400)
+    }
 
     try {
         await contentModel.create({
@@ -30,12 +23,11 @@ contentRouter.post('/content', authMiddleware, async (req, res) => {
 
         res.json({ message: "content added" })
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "failed to add content" })
+        throw new ApiError("failed to add content", 500)
     }
-})
+}
 
-contentRouter.get('/content', authMiddleware, async (req, res) => {
+const getContent = async (req: Request, res: Response) => {
     const userId = req.userId;
     try {
         const userContent = await contentModel.find({
@@ -43,25 +35,39 @@ contentRouter.get('/content', authMiddleware, async (req, res) => {
         }).populate('userId', 'email')
 
         res.json({
+            success: true,
             content: userContent
         })
     } catch (error) {
-        res.json({
-            message: "Failed to get content"
-        })
+        throw new ApiError("Failed to get content", 500);
     }
-})
+}
 
-contentRouter.delete('/content', authMiddleware, async (req, res) => {
-    const { contentId } = req.body;
-    await contentModel.deleteOne({
-        id: contentId,
-        userId: req.userId
-    })
-    res.json({ message: "content deleted" })
-})
+const deleteContent = async (req: Request, res: Response) => {
+    const { contentId } = req.params;
+    if(!contentId){
+        throw new ApiError("contentId is required",400)
+    }
 
-contentRouter.post('/brain/share', authMiddleware, async (req: Request, res) => {
+    try {
+        const deleteResult = await contentModel.deleteOne({
+            _id: contentId,
+            userId: req.userId
+        })
+
+        if(deleteResult.deletedCount === 0){
+            throw new ApiError("Content not found or not authorized", 404);
+        }
+        res.json({
+            success: true,
+            message: "content deleted"
+        })
+    } catch (error) {
+        throw new ApiError("content deletion failed", 500)
+    }
+}
+
+const createShareableLink = async (req: Request, res: Response) => {
     const { share } = req.body;
     const userId = req.userId;
 
@@ -72,6 +78,7 @@ contentRouter.post('/brain/share', authMiddleware, async (req: Request, res) => 
 
         if (linkExist) {
             res.json({
+                success: true,
                 hash: linkExist.hash
             })
             return
@@ -85,6 +92,7 @@ contentRouter.post('/brain/share', authMiddleware, async (req: Request, res) => 
         })
 
         res.json({
+            success: true,
             hash
         })
     } else {
@@ -92,12 +100,13 @@ contentRouter.post('/brain/share', authMiddleware, async (req: Request, res) => 
             userId
         })
         res.json({
+            success: true,
             message: "Remove link"
         })
     }
-})
+}
 
-contentRouter.get('/brain/:sharelink', async (req: Request, res) => {
+const getSharedBrain = async (req: Request, res: Response) => {
     const hash = req.params.sharelink;
     try {
         const link = await linkModel.findOne({
@@ -106,6 +115,7 @@ contentRouter.get('/brain/:sharelink', async (req: Request, res) => {
 
         if (!link) {
             res.json({
+                success: false,
                 message: "sorry incorrect inputs"
             })
             return;
@@ -116,14 +126,18 @@ contentRouter.get('/brain/:sharelink', async (req: Request, res) => {
         }).populate("userId", "email")
 
         res.json({
+            success: true,
             content
         })
     } catch (error) {
-        res.json({
-            message: "content not available"
-        })
+        throw new ApiError("content not available", 404)
     }
-})
+}
 
-export { contentRouter };
-
+export {
+    createContent,
+    deleteContent,
+    getSharedBrain,
+    getContent,
+    createShareableLink
+};

@@ -14,14 +14,6 @@ export const Signin = () => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: signinUser,
-    onSuccess: (data) => {
-      localStorage.setItem('token', String(data.token))
-      toast.success("Signin successfully")
-      navigate('/dashboard')
-    },
-    onError: (error: Error) => {
-      toast.success(error.message)
-    }
   });
 
   const handleSubmit = () => {
@@ -29,7 +21,17 @@ export const Signin = () => {
       toast.error('Please fill in all fields');
       return;
     }
-    mutate(user);
+    
+    mutate(user, {
+      onSuccess: (data) => {
+        localStorage.setItem('token', String(data.token))
+        toast.success("Signin successfully")
+        navigate('/dashboard')
+      },
+      onError: (error: Error) => {
+        toast.success(error.message)
+      }
+    });
   };
 
   return (

@@ -7,19 +7,13 @@ import { signupUser } from "../api/signupUser"
 import { AuthLayout } from "../components/AuthLayout"
 
 export const Signup = () => {
+
   const [user, setUser] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: signupUser,
-    onSuccess: (data) => {
-      toast.success(data.message)
-      navigate('/signin')
-    },
-    onError: (error: Error) => {
-      toast.success(error.message)
-    }
+    mutationFn:signupUser
   });
 
   const handleSubmit = () => {
@@ -27,7 +21,18 @@ export const Signup = () => {
       alert('Please fill in all fields');
       return;
     }
-    mutate(user);
+
+    mutate(user, {
+      onSuccess: (data) => {
+        localStorage.setItem('token', String(data.token))
+        toast.success(data.message)
+        navigate('/signin')
+      },
+      onError: (error: Error) => {
+        toast.success(error.message)
+      }
+    });
+    
   };
 
   return (
@@ -51,7 +56,6 @@ export const Signup = () => {
               required
             />
           </div>
-          {user.email && <p className="text-sm text-red-600">{user.email}</p>}
         </div>
 
         {/* Password Field */}
@@ -78,7 +82,6 @@ export const Signup = () => {
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
-          {user.password && <p className="text-sm text-red-600">{user.password}</p>}
         </div>
 
         {/* Submit Button */}

@@ -9,7 +9,7 @@ import type { Content } from "../utils/types";
 export function SharedDashboard() {
     const [contentdata, setContentData] = useState<Content[]>([]);
     const [activeFilter, setActiveFilter] = useState<"all" | "youtube" | "twitter">("all");
-    let params = useParams();
+    const params = useParams();
 
     const { data, isLoading, error } = useQuery({
         queryKey: [`${params.hash}`],
@@ -63,7 +63,7 @@ export function SharedDashboard() {
                             </div>
                         ) : (
                             filteredData.map(({ type, title, link, _id }) => (
-                                <Card key={_id} type={type} title={title} link={link} />
+                                <Card key={_id} id={_id} type={type} title={title} link={link} />
                             ))
                         )}
                     </div>

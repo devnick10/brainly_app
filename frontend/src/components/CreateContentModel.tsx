@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { CrossIcon } from "../icons/CrossIcon"
 import { Button } from "./Button"
 import { Input } from "./Input"
@@ -8,11 +8,7 @@ import toast from "react-hot-toast"
 type onChangeType = ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
 
 export const CreateContentModel = ({ open, onClose }: { open: boolean, onClose: () => void }) => {
-    const [content, setContent] = useState({
-        title: "",
-        link: "",
-        type: ""
-    });
+    const queryclient = useQueryClient()
     const selectOptions = [
         {
             value: "youtube",
@@ -23,11 +19,17 @@ export const CreateContentModel = ({ open, onClose }: { open: boolean, onClose: 
             title: "Twitter"
         }
     ]
+    const [content, setContent] = useState({
+        title: "",
+        link: "",
+        type: ""
+    });
 
     const { mutate, isPending } = useMutation({
         mutationFn: addContent,
         onSuccess: (data) => {
             toast.success(data.message)
+            queryclient.invalidateQueries({ queryKey: ['content'] })
             onClose()
         },
         onError: () => {
@@ -75,6 +77,9 @@ export const CreateContentModel = ({ open, onClose }: { open: boolean, onClose: 
                                     onChange={handleOnChnage}
                                     className="block w-full px-4 py-2 border rounded mt-1 bg-purple-200 text-purple-600"
                                 >
+                                    <option value="" disabled hidden>
+                                        Select content type
+                                    </option>
                                     {selectOptions.map((op) => (
                                         <option key={op.value} value={op.value}>
                                             {op.title}
@@ -86,7 +91,7 @@ export const CreateContentModel = ({ open, onClose }: { open: boolean, onClose: 
                         <div className="flex justify-center">
                             <Button loading={isPending} onClick={() => {
                                 mutate(content)
-                                setContent({title:"",link:"",type:""})
+                                setContent({ title: "", link: "", type: "" })
                             }} variant="Primary" text="Submit" />
                         </div>
                     </div>

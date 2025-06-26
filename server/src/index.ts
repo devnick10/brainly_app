@@ -1,10 +1,12 @@
-import dotenv from 'dotenv';
-dotenv.config()
+
 import cors from "cors";
 import express from "express";
-import { FRONDEND_URL, PORT, verifyEnvironmentVariables } from './config';
+import { FRONDEND_URL, NODE_ENV, PORT, verifyEnvironmentVariables } from './config';
 import { connectDB } from "./db/config";
-import { userRouter } from './routes/user';
+import morgan from "morgan";
+import { errorHandler } from "./middleware/errorHandler";
+import { contentRouter } from "./routes/brain.route";
+import { userRouter } from './routes/user.route';
 
 const app  = express();
 
@@ -13,15 +15,24 @@ app.use(cors({
     methods:['POST','PUT','DELETE','GET'],
     credentials:true
 }))
-app.use(express.json());
-app.use('/api/v1',userRouter)
 
+if(NODE_ENV==="development"){
+    app.use(morgan('dev'))
+}
 
+app.use(express.json({limit:"10kb"}));
+app.use(express.urlencoded({extended:true,limit:"10kb"}));
+
+app.use('/api/v1/user',userRouter)
+app.use('/api/v1/brain',contentRouter)
+
+// error handler
+app.use(errorHandler)
 
 connectDB().then(()=>{
     verifyEnvironmentVariables()
     app.listen(PORT || 3000,()=>{
-        console.log("server is running");
+        console.log("server is running at PORT || " + PORT);
     })
 }).catch((err)=>{
     console.error(err)

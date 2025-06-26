@@ -1,3 +1,6 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import { deleteContent } from "../api/deleteContent";
 import { ShareIcon } from "../icons/ShareIcon";
 import { TwitterIcon } from "../icons/TwitterIcon";
 import { UninstallIcon } from "../icons/UninstallIcon";
@@ -6,9 +9,16 @@ interface CardProps {
     type: "twitter" | "youtube";
     title: string;
     link: string;
+    id:string;
 }
 
-export const Card = ({ type, title, link }: CardProps) => {
+export const Card = ({ type, title, link,id }: CardProps) => {
+    const queryclient = useQueryClient()
+    
+    const {isSuccess ,mutate } = useMutation({
+        mutationFn: deleteContent
+    })
+
     return (
         <div className="p-4 max-w-72 border rounded-md bg-white border-slate-200 min-h-48 min-w-72">
             <div className="flex items-center justify-between">
@@ -22,7 +32,13 @@ export const Card = ({ type, title, link }: CardProps) => {
                             <ShareIcon />
                         </a>
                     </div>
-                    <div className="cursor-pointer pl-0.5"><UninstallIcon /></div>
+                    <div onClick={() => {
+                        mutate(id)
+                        if(isSuccess){
+                            toast.success("content deleted")
+                            queryclient.invalidateQueries({queryKey:['content']})
+                        }
+                    }} className="cursor-pointer pl-0.5"><UninstallIcon /></div>
                 </div>
             </div>
 

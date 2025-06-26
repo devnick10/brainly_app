@@ -6,7 +6,7 @@ import { PlusIcon } from "../icons/PlusIcon";
 import { ShareIcon } from "../icons/ShareIcon";
 import { SideBar } from "../components/SideBar";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getContent } from "../api/content";
+import { getContent } from "../api/getContent";
 import { createLink } from "../api/createLink";
 import toast from "react-hot-toast";
 import type { Content } from "../utils/types";
@@ -80,6 +80,9 @@ export function Dashboard() {
             error && <div>Error loading content</div>
           }
           {
+            contentdata.length === 0 && <div>No content yet</div>
+          }
+          {
             <div className="flex gap-4 flex-wrap">
               {filteredData.length === 0 ? (
                 <div className="w-full text-center py-8 text-gray-500">
@@ -87,7 +90,7 @@ export function Dashboard() {
                 </div>
               ) : (
                 filteredData.map(({ type, title, link, _id }) => (
-                  <Card key={_id} type={type} title={title} link={link} />
+                  <Card key={_id} id={_id} type={type} title={title} link={link} />
                 ))
               )}
             </div>
