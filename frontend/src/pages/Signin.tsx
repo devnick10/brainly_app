@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { Eye, EyeOff, Github, Lock, Mail } from "lucide-react";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { signinUser } from "../api/signinUser";
@@ -16,7 +16,8 @@ export const Signin = () => {
     mutationFn: signinUser,
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = (e:FormEvent) => {
+    e.preventDefault();
     if (!user.email || !user.password) {
       toast.error('Please fill in all fields');
       return;
