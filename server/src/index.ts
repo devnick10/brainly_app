@@ -26,6 +26,12 @@ app.use(express.urlencoded({extended:true,limit:"10kb"}));
 app.use('/api/v1/user',userRouter)
 app.use('/api/v1/brain',contentRouter)
 
+// health check 
+
+app.get('/',(req,res)=>{
+    res.status(200).json({message:"server is healthy"})
+})
+
 // error handler
 app.use(errorHandler)
 
