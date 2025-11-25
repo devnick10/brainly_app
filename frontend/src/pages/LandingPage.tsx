@@ -8,19 +8,19 @@ export default function BrainlyLanding() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b-[1px] border-neutral-300 shadow-sm bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Brain className="h-8 w-8 text-blue-600" />
             <span className="text-2xl font-bold text-gray-900">Brainly</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link to="/signin" className="px-4 py-2 border rounded-md bg-purple-200 text-purple-600 hover:text-gray-900 transition-colors font-medium">
+            <Link to="/signin" className="px-4 py-2 shadow-md hover:shadow-lg rounded-md  font-bold bg-white text-purple-600 hover:text-gray-900 transition-colors ">
               Sign In
             </Link>
             <Link
               to="/signup"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-semibold"
             >
               Get Started
             </Link>
