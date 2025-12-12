@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { NODE_ENV } from "../config";
+import { config } from "../config";
 
 export class ApiError extends Error {
     public isOperational: boolean;
@@ -13,7 +13,7 @@ export class ApiError extends Error {
 
 
 export const errorHandler = (err: ApiError, req: Request, res: Response, next: NextFunction) => {
-    if (NODE_ENV === "development") {
+    if (config.get("NODE_ENV") === "development") {
         res.status(err.statusCode || 500).json({
             message: err.message || "Internal server error",
             success: false,

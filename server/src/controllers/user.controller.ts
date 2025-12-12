@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import { userModel } from "../models/userSchema";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../config";
 import { ApiError } from "../middleware/errorHandler";
+import { config } from "../config";
 
-const signup =  async (req: Request, res: Response) => {
+const signup = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     try {
@@ -12,19 +12,19 @@ const signup =  async (req: Request, res: Response) => {
             email,
             password
         })
-        const token = jwt.sign({ id: user.id }, JWT_SECRET as string,{expiresIn:'12h'})
+        const token = jwt.sign({ id: user.id }, config.get("JWT_SECRET"), { expiresIn: '12h' })
         res.json({
-            success:true,
+            success: true,
             message: "Singup successfully.",
             token
         })
     } catch (error) {
         console.error(error);
-        throw new ApiError("User allready signup.",409);
+        throw new ApiError("User allready signup.", 409);
     }
 }
 
-const signin = async (req:Request, res:Response) => {
+const signin = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     const userExist = await userModel.findOne({
@@ -32,14 +32,14 @@ const signin = async (req:Request, res:Response) => {
         password
     })
     if (userExist) {
-        const token = jwt.sign({ id: userExist.id }, JWT_SECRET as string,{expiresIn:'1hr'})
+        const token = jwt.sign({ id: userExist.id },config.get("JWT_SECRET"), { expiresIn: '1hr' })
         res.json({
-            success:true,
-            message:"Signin successfully",
+            success: true,
+            message: "Signin successfully",
             token
         })
     } else {
-        throw new ApiError("Incorrect credentials",401)
+        throw new ApiError("Incorrect credentials", 401)
     }
 }
 

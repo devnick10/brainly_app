@@ -1,22 +1,23 @@
 import dotenv from 'dotenv';
 dotenv.config()
 
-const JWT_SECRET = process.env.JWT_SECRET
-const FRONDEND_URL = process.env.FRONDEND_URL
-const DATABASE_URL = process.env.DATABASE_URL
-const PORT = process.env.PORT
-const NODE_ENV = process.env.NODE_ENV
-
-export function verifyEnvironmentVariables() {
-    if (!JWT_SECRET || !FRONDEND_URL || !DATABASE_URL || !PORT || !NODE_ENV) {
-        throw new Error("All Environment variabled required")
-    }
+const _config: { [key: string]: string | undefined } = {
+    JWT_SECRET: process.env.JWT_SECRET,
+    FRONDEND_URL: process.env.FRONDEND_URL,
+    DATABASE_URL: process.env.DATABASE_URL,
+    PORT: process.env.PORT,
+    NODE_ENV: process.env.NODE_ENV,
 }
 
-export {
-    JWT_SECRET,
-    FRONDEND_URL,
-    DATABASE_URL,
-    PORT,
-    NODE_ENV
-}
+export const config = {
+    get: (key: string) => {
+        const value = _config[key];
+        if (!value) {
+            console.error(
+                `The ${key} variable not found, Make sure to pass envorinment variables!`
+            );
+            process.exit();
+        }
+        return value;
+    },
+};
