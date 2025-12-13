@@ -17,7 +17,7 @@ declare global {
     }
 }
 
-contentRouter.post('/create', authMiddleware, createContent)
+contentRouter.post('/', authMiddleware, createContent)
 
 contentRouter.get('/', authMiddleware, getContent)
 
