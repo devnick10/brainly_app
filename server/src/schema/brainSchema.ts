@@ -1,6 +1,6 @@
-import { Mongoose, Types } from "mongoose";
+import { Types } from "mongoose";
 import z from "zod";
-enum ContenType {"youtube","twitter"}
+enum ContenType {"youtube","twitter","other"}
 const createContentSchema = z.object({
     link:z.string(),
     title: z.string(),
@@ -13,5 +13,6 @@ const deleteContentSchema = z.object({
 
 export {
     createContentSchema,
-    deleteContentSchema,
-}
+    deleteContentSchema
+};
+

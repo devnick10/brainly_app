@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-const contentTypes = ['youtube', 'twitter'];
+const contentTypes = ['youtube', 'twitter','other'];
 
 const contentSchema = new Schema({
     link: {
