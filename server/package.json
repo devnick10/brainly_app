@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node ./dist/index.js",
-    "build": "tsc",
-    "dev": "tsx watch src/index.ts"
+    "start": "bun run src/index.ts",
+    "dev": "bun run --hot src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +17,8 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.15.0",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@types/cors": "^2.8.18",
@@ -26,6 +26,8 @@
     "@types/jsonwebtoken": "^9.0.9",
     "@types/morgan": "^1.9.10",
     "tsx": "^4.20.3",
-    "typescript": "^5.8.3"
-  }
+    "typescript": "^5.8.3",
+    "@types/bun": "latest"
+  },
+  "private": true
 }
