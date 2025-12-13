@@ -3,10 +3,15 @@ import { userModel } from "../models/userSchema";
 import jwt from "jsonwebtoken";
 import { ApiError } from "../middleware/errorHandler";
 import { config } from "../config";
+import { signinSchema, signupSchema } from "../schema/userSchema";
 
 const signup = async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+    const { data, success } = signupSchema.safeParse(req.body);
+    if (!success) {
+        throw new ApiError("All fields are required", 400)
+    }
 
+    const { email, password } = data;
     try {
         const user = await userModel.create({
             email,
@@ -25,14 +30,18 @@ const signup = async (req: Request, res: Response) => {
 }
 
 const signin = async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+    const { data, success } = signinSchema.safeParse(req.body);
+    if (!success) {
+        throw new ApiError("All fields are required", 400)
+    }
 
+    const { email, password } = data;
     const userExist = await userModel.findOne({
         email,
         password
     })
     if (userExist) {
-        const token = jwt.sign({ id: userExist.id },config.get("JWT_SECRET"), { expiresIn: '1hr' })
+        const token = jwt.sign({ id: userExist.id }, config.get("JWT_SECRET"), { expiresIn: '1hr' })
         res.json({
             success: true,
             message: "Signin successfully",

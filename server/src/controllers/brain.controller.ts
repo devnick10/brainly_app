@@ -3,15 +3,16 @@ import { contentModel } from "../models/contentSchema";
 import { linkModel } from "../models/linkSchema";
 import { random } from "../utils";
 import { ApiError } from "../middleware/errorHandler";
+import { createContentSchema, deleteContentSchema } from "../schema/brainSchema";
 
 const createContent = async (req: Request, res: Response) => {
-    const { link, title, type } = req.body;
     const userId = req.userId;
-    
-    if(!link || !title || !type){
+    const {data,success} = createContentSchema.safeParse(req.body);
+    if(!success){
         throw new ApiError("All fields are required",400)
     }
 
+    const { link, title, type } = data;
     try {
         await contentModel.create({
             link,
@@ -44,11 +45,12 @@ const getContent = async (req: Request, res: Response) => {
 }
 
 const deleteContent = async (req: Request, res: Response) => {
-    const { contentId } = req.params;
-    if(!contentId){
-        throw new ApiError("contentId is required",400)
+    const {data,success} = deleteContentSchema.safeParse(req.params);
+    if(!success){
+        throw new ApiError("All fields are required",400)
     }
-
+    
+    const { contentId } = data;
     try {
         const deleteResult = await contentModel.deleteOne({
             _id: contentId,
