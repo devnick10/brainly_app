@@ -7,11 +7,13 @@ interface UserData {
   email: string;
   password: string;
 }
+
 interface AuthLayoutProps {
   children: React.ReactNode
   title: string
   subtitle: string
 }
+
 interface Content {
   _id: string;
   link: string;
@@ -23,10 +25,10 @@ interface Content {
     email: string
   }
 }
+
 export type {
     ContentData,
     UserData,
     AuthLayoutProps,
     Content
-
 }

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { userModel } from "../models/userSchema";
 import jwt from "jsonwebtoken";
 import { ApiError } from "../middleware/errorHandler";
-import { config } from "../config";
+import { config } from "../config/config";
 import { signinSchema, signupSchema } from "../schema/userSchema";
 
 const signup = async (req: Request, res: Response) => {

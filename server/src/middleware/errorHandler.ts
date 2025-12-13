@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { config } from "../config";
+import { config } from "../config/config";
 
 export class ApiError extends Error {
     public isOperational: boolean;

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { contentModel } from "../models/contentSchema";
 import { linkModel } from "../models/linkSchema";
-import { random } from "../utils";
+import { random } from "../utils/utils";
 import { ApiError } from "../middleware/errorHandler";
 import { createContentSchema, deleteContentSchema } from "../schema/brainSchema";
 

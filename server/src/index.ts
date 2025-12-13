@@ -1,13 +1,12 @@
-
 import cors from "cors";
 import express from "express";
 
-import { connectDB } from "./db/config";
 import morgan from "morgan";
+import { config } from "./config/config";
 import { errorHandler } from "./middleware/errorHandler";
 import { contentRouter } from "./routes/brain.route";
 import { userRouter } from './routes/user.route';
-import { config } from "./config";
+import { healthCheckRouter } from "./routes/healthcheck.route";
 
 const app = express();
 
@@ -26,21 +25,9 @@ app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
 app.use('/api/v1/user', userRouter)
 app.use('/api/v1/brain', contentRouter)
-
-// health check 
-
-app.get('/', (req, res) => {
-    res.status(200).json({ message: "server is healthy" })
-})
+app.use('/',healthCheckRouter);
 
 // error handler
 app.use(errorHandler)
 
-const PORT = config.get("PORT")
-connectDB().then(() => {
-    app.listen(PORT || 3000, () => {
-        console.log("server is running at PORT || " + PORT);
-    })
-}).catch((err) => {
-    console.error(err)
-})
+export { app };

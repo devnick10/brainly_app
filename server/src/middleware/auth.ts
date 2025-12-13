@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { config } from "../config";
+import { config } from "../config/config";
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers['authorization']?.split(" ")[1];

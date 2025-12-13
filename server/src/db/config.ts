@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { config } from "../config";
+import { config } from "../config/config";
 const DATABASE_URL = config.get("DATABASE_URL");
 
 export const connectDB = async ()=>{
