@@ -1,10 +1,12 @@
 import { Hono } from 'hono'
-import { logger } from 'hono/logger'
 import { cors } from 'hono/cors'
+import { logger } from 'hono/logger'
 import { authMiddleware } from './middlewares/auth'
-import { Bindings } from './types'
+import { AppContext } from './types'
 
-const app = new Hono<{ Bindings: Bindings }>()
+
+const app = new Hono<AppContext>()
+
 /**
  * TODO
  * 1. add DB with schema -- with vector  

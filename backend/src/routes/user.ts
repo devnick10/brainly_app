@@ -1,8 +1,8 @@
 import { Hono } from "hono"
-import { Bindings } from "../types";
+import { AppContext, Bindings } from "../types";
 
 
-const userRouter = new Hono<{ Bindings: Bindings }>()
+const userRouter = new Hono<AppContext>()
 
 userRouter.post("/signup", (c) => {
 

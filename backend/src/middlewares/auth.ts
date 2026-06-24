@@ -1,7 +1,7 @@
 import { createMiddleware } from 'hono/factory'
-import { Bindings } from '../types'
+import { AppContext } from '../types'
 
-export const authMiddleware = createMiddleware<{ Bindings: Bindings, Variables: { userId: string } }>(async (c, next) => {
+export const authMiddleware = createMiddleware<AppContext>(async (c, next) => {
   //TODO
   // get token from header 
   // verify using jwt 
