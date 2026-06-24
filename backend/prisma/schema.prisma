@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client"
+  runtime  = "cloudflare"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ContentType {
+  YOUTUBE
+  TWITTER
+  ARTICLE
+  DOCUMENT
+}
+
+model User {
+  id       String @id @default(cuid())
+  email    String @unique
+  password String
+
+  contents Content[]
+  links    Link[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Content {
+  id String @id @default(cuid())
+
+  title       String
+  description String?
+
+  link String
+  type ContentType
+
+  searchableText String?
+
+  embedding Unsupported("vector(768)")?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tags Tag[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([userId, title])
+}
+
+model Tag {
+  id    String @id @default(cuid())
+  title String @unique
+
+  contents Content[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Link {
+  id   String @id @default(cuid())
+  hash String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
