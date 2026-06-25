@@ -1,6 +1,7 @@
 interface ContentData {
-    title: string;
-    link: string;
+  title: string;
+  link: string;
+  type: string;
 }
 
 interface UserData {
@@ -9,26 +10,19 @@ interface UserData {
 }
 
 interface AuthLayoutProps {
-  children: React.ReactNode
-  title: string
-  subtitle: string
+  children: React.ReactNode;
+  title: string;
+  subtitle: string;
 }
 
 interface Content {
-  _id: string;
+  id: string;
   link: string;
   title: string;
-  type: "twitter" | 'youtube';
-  tags: []
-  userId: {
-    _id: string;
-    email: string
-  }
+  type: "youtube" | "twitter";
+  tags: { id: string; title: string }[];
+  userId: string;
+  user?: { email: string };
 }
 
-export type {
-    ContentData,
-    UserData,
-    AuthLayoutProps,
-    Content
-}
+export type { ContentData, UserData, AuthLayoutProps, Content }

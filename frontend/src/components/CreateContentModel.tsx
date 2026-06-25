@@ -1,104 +1,110 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { CrossIcon } from "../icons/CrossIcon"
-import { Button } from "./Button"
-import { Input } from "./Input"
+import { useState } from "react"
+import { toast } from "sonner"
 import { addContent } from "../api/addcontent"
-import { useState, type ChangeEvent } from "react"
-import toast from "react-hot-toast"
-type onChangeType = ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
+import { Button } from "./ui/button"
+import { Input } from "./ui/input"
+import { Label } from "./ui/label"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select"
 
-export const CreateContentModel = ({ open, onClose }: { open: boolean, onClose: () => void }) => {
-    const queryclient = useQueryClient()
-    const selectOptions = [
-        {
-            value: "youtube",
-            title: "Youtube"
-        },
-        {
-            value: "twitter",
-            title: "Twitter"
-        }
-    ]
-    const [content, setContent] = useState({
-        title: "",
-        link: "",
-        type: ""
-    });
+interface CreateContentModelProps {
+  open: boolean
+  onClose: () => void
+}
 
-    const { mutate, isPending } = useMutation({
-        mutationFn: addContent,
-        onSuccess: (data) => {
-            toast.success(data.message)
-            queryclient.invalidateQueries({ queryKey: ['content'] })
-            onClose()
-        },
-        onError: () => {
-            toast.success("Failed to add content.")
-        }
-    })
+export function CreateContentModel({ open, onClose }: CreateContentModelProps) {
+  const queryClient = useQueryClient()
+  const [title, setTitle] = useState("")
+  const [link, setLink] = useState("")
+  const [type, setType] = useState("")
 
-    function handleOnChnage(e: onChangeType) {
-        const { name, value } = e.target;
-        setContent(prev => ({ ...prev, [name]: value }))
+  const { mutate, isPending } = useMutation({
+    mutationFn: addContent,
+    onSuccess: () => {
+      toast.success("Content added successfully")
+      queryClient.invalidateQueries({ queryKey: ['content'] })
+      setTitle("")
+      setLink("")
+      setType("")
+      onClose()
+    },
+    onError: () => {
+      toast.error("Failed to add content")
     }
+  })
 
+  const handleSubmit = () => {
+    if (!title || !link || !type) {
+      toast.error("Please fill in all fields")
+      return
+    }
+    mutate({ title, link, type })
+  }
 
-    return (
-        <div onClick={() => onClose()}>
-            {
-                open &&
-                <div className="w-full h-screen backdrop-blur-[2px] fixed top-0 left-0 flex justify-center items-center" onClick={(e) => e.stopPropagation()}>
-                    <div className="bg-slate-100 rounded-md p-2">
-                        <div className="flex justify-end items-center mb-4">
-                            <div onClick={() => onClose()} className="cursor-pointer">
-                                <CrossIcon />
-                            </div>
-                        </div>
-                        <div className="mb-2">
-                            <Input
-                                placeholder="Title"
-                                onChange={handleOnChnage}
-                                name={"title"}
-                                value={content.title}
-                                className="mb-2"
-                            />
-                            <Input
-                                placeholder="Link"
-                                onChange={handleOnChnage}
-                                name={"link"}
-                                value={content.link}
-                            />
-                            <div className="mt-2 text-slate-600">
-                                <label htmlFor="content-type" className="">Content Type</label>
-                                <select
-                                    id="content-type"
-                                    name="type"
-                                    value={content.type}
-                                    onChange={handleOnChnage}
-                                    className="block w-full px-4 py-2 border rounded mt-1 bg-purple-200 text-purple-600"
-                                >
-                                    <option value="" disabled hidden>
-                                        Select content type
-                                    </option>
-                                    {selectOptions.map((op) => (
-                                        <option key={op.value} value={op.value}>
-                                            {op.title}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                        <div className="flex justify-center">
-                            <Button loading={isPending} onClick={() => {
-                                mutate(content)
-                                setContent({ title: "", link: "", type: "" })
-                            }} variant="Primary" text="Submit" />
-                        </div>
-                    </div>
-                </div>
-
-            }
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Add Content</DialogTitle>
+          <DialogDescription>
+            Save a YouTube video or Twitter post to your brain.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="title">Title</Label>
+            <Input
+              id="title"
+              placeholder="Enter a title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="link">Link</Label>
+            <Input
+              id="link"
+              placeholder="Paste YouTube or Twitter URL"
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="type">Content Type</Label>
+            <Select value={type} onValueChange={setType}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select content type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="youtube">YouTube</SelectItem>
+                <SelectItem value="twitter">Twitter</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-
-    )
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} disabled={isPending}>
+            {isPending ? "Adding..." : "Add Content"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
 }
