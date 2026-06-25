@@ -1,12 +1,11 @@
 import type { ContentData } from "../utils/types";
 
-
 export async function addContent(data: ContentData) {
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/brain/create`, {
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/brain`, {
         method: "POST",
         headers: {
             'Content-Type': 'application/json',
-            'Authorization':`Bearer ${String(localStorage.getItem('token'))}` ,
+            'Authorization': `Bearer ${String(localStorage.getItem('token'))}`,
         },
         body: JSON.stringify(data)
     });

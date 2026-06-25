@@ -1,64 +1,99 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
-import { deleteContent } from "../api/deleteContent";
-import { ShareIcon } from "../icons/ShareIcon";
-import { TwitterIcon } from "../icons/TwitterIcon";
-import { UninstallIcon } from "../icons/UninstallIcon";
-import { YoutTubeIcon } from "../icons/YoutTubeIcon";
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { ExternalLink, Trash2, Youtube, Twitter } from "lucide-react"
+import { toast } from "sonner"
+import { deleteContent } from "../api/deleteContent"
+import { Button } from "./ui/button"
+import {
+  Card as UICard,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./ui/card"
+
 interface CardProps {
-    type: "twitter" | "youtube";
-    title: string;
-    link: string;
-    id:string;
+  type: "twitter" | "youtube"
+  title: string
+  link: string
+  id: string
 }
 
-export const Card = ({ type, title, link,id }: CardProps) => {
-    const queryclient = useQueryClient()
-    
-    const {isSuccess ,mutate } = useMutation({
-        mutationFn: deleteContent
-    })
+export function ContentCard({ type, title, link, id }: CardProps) {
+  const queryClient = useQueryClient()
 
-    return (
-        <div className="p-4 max-w-72 border rounded-md bg-white border-slate-200 min-h-48 min-w-72">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 ">
-                    <div className="text-gray-500">{type === "twitter" ? <TwitterIcon /> : <YoutTubeIcon />}</div>
-                    <div className="text-md font-semibold">{title.slice(0, 20) + "..."}</div>
-                </div>
-                <div className="flex items-center gap-1.5 text-gray-500">
-                    <div>
-                        <a href={link} target="_blank">
-                            <ShareIcon />
-                        </a>
-                    </div>
-                    <div onClick={() => {
-                        mutate(id)
-                        if(isSuccess){
-                            toast.success("content deleted")
-                            queryclient.invalidateQueries({queryKey:['content']})
-                        }
-                    }} className="cursor-pointer pl-0.5"><UninstallIcon /></div>
-                </div>
-            </div>
+  const { mutate, isPending } = useMutation({
+    mutationFn: deleteContent,
+    onSuccess: () => {
+      toast.success("Content deleted")
+      queryClient.invalidateQueries({ queryKey: ['content'] })
+    },
+    onError: () => {
+      toast.error("Failed to delete content")
+    }
+  })
 
-            <div className="pt-4">
-                {
-                    type === "youtube" && (<>
-                        <iframe className="w-full" src={
-                            link.replace("watch", "embed").replace("?v=", "/")
-                        } title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen>
-                        </iframe>
-                    </>)
-                }
-                {
-                    type === "twitter" && (<>
-                        <blockquote className="twitter-tweet">
-                            <a href={link.replace("x.com", "twitter.com")}></a>
-                        </blockquote>
-                    </>)
-                }
-            </div>
+  return (
+    <UICard className="w-80 overflow-hidden">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {type === "twitter" ? (
+              <Twitter className="h-4 w-4 text-sky-500" />
+            ) : (
+              <Youtube className="h-4 w-4 text-red-500" />
+            )}
+            <CardTitle className="text-sm font-medium truncate max-w-48">
+              {title}
+            </CardTitle>
+          </div>
+          <div className="flex items-center gap-1">
+            <a href={link} target="_blank" rel="noreferrer">
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <ExternalLink className="h-4 w-4" />
+              </Button>
+            </a>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-destructive hover:text-destructive"
+              onClick={() => mutate(id)}
+              disabled={isPending}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
-    )
+      </CardHeader>
+      <CardContent className="pb-3">
+        {type === "youtube" && (
+          <iframe
+            className="w-full aspect-video rounded-md"
+            src={link.replace("watch", "embed").replace("?v=", "/")}
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          />
+        )}
+        {type === "twitter" && (
+          <div className="bg-muted rounded-md p-4 text-sm text-muted-foreground">
+            <blockquote className="twitter-tweet">
+              <a href={link.replace("x.com", "twitter.com")}>View on Twitter</a>
+            </blockquote>
+          </div>
+        )}
+      </CardContent>
+      <CardFooter className="pt-0">
+        <a
+          href={link}
+          target="_blank"
+          rel="noreferrer"
+          className="text-xs text-muted-foreground hover:text-primary truncate w-full"
+        >
+          {link}
+        </a>
+      </CardFooter>
+    </UICard>
+  )
 }

@@ -1,30 +1,26 @@
 import { Brain } from "lucide-react"
-import {Link} from "react-router-dom"
+import { Link } from "react-router-dom"
 import type { AuthLayoutProps } from "../utils/types"
-
-
+import { Card, CardContent } from "./ui/card"
 
 export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity">
-            <Brain className="h-8 w-8 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900">Brainly</span>
+            <Brain className="h-8 w-8 text-primary" />
+            <span className="text-2xl font-bold">Brainly</span>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">{title}</h1>
-          <p className="text-gray-600">{subtitle}</p>
+          <h1 className="text-2xl font-bold mb-2">{title}</h1>
+          <p className="text-muted-foreground">{subtitle}</p>
         </div>
-
-        {/* Auth Form */}
-        <div className="bg-white rounded-lg shadow-lg p-8">{children}</div>
-
-        {/* Back to Home */}
+        <Card>
+          <CardContent className="p-6">{children}</CardContent>
+        </Card>
         <div className="text-center mt-6">
-          <Link to="/" className="text-sm text-gray-600 hover:text-blue-600 transition-colors">
-            ← Back to Home
+          <Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            &larr; Back to Home
           </Link>
         </div>
       </div>
