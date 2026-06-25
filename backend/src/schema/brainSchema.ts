@@ -1,17 +1,18 @@
 import z, { string } from "zod";
-enum ContenType { "youtube", "twitter", "other" }
-const createContentSchema = z.object({
+import { ContentType } from "../generated/prisma/enums";
+const CreateContentSchema = z.object({
     link: z.string(),
     title: z.string(),
-    type: z.enum(ContenType)
+    description: z.string().optional(),
+    type: z.enum(ContentType)
 })
 
-const deleteContentSchema = z.object({
+const DeleteContentSchema = z.object({
     contentId: string
 })
 
 export {
-    createContentSchema,
-    deleteContentSchema
+    CreateContentSchema,
+    DeleteContentSchema
 };
 

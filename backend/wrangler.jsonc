@@ -28,14 +28,14 @@
   //     "database_id": ""
   //   }
   // ],
-  // "ai": {
-  //   "binding": "AI"
-  // },
+  "ai": {
+    "binding": "AI",
+  },
   // "observability": {
   //   "enabled": true,
   //   "head_sampling_rate": 1
   // }
   "secrets": {
-    "required": ["JWT_SECRET", "DATABASE_URL","ACCESS_ORIGIN"],
+    "required": ["JWT_SECRET", "DATABASE_URL", "ACCESS_ORIGIN"],
   },
 }
