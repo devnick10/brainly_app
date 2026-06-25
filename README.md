@@ -1,100 +1,207 @@
-# 🧠 Brainly App
+# Brainly App
 
-Brainly is a simple and powerful web application that allows users to save and share content (like YouTube and Twitter links) for watching later. Think of it as your personal "watch later" vault, with easy sharing capabilities.
+Brainly is an AI-powered content bookmarking platform that helps users save, organize, search, and share content from YouTube, X (Twitter), articles, and other sources. Instead of relying only on exact keywords, Brainly uses vector embeddings and semantic search to retrieve content based on meaning and context.
 
-## 🚀 Features
+## Features
 
-- ✨ User Authentication (Sign Up & Sign In)
-- 📋 Dashboard for viewing saved content
-- 🔗 Add YouTube or Twitter links with a custom title and type
-- 📤 Share an entire collection (called a "Brain") or a specific piece of content
-- 🌐 Public pages accessible through shareable links
-- 📋 One-click copy link to clipboard
+* Secure user authentication using JWT
+* Save content from YouTube, X (Twitter), articles, and documents
+* Organize content with tags and categories
+* AI-powered semantic search using vector embeddings
+* Find saved content using natural language queries
+* Public sharing of your entire content collection
+* Unique shareable links for collaboration and discovery
+* Responsive dashboard for managing saved content
+* Fast vector similarity search powered by pgvector
 
-## 🖥️ Tech Stack
+## Tech Stack
 
 ### Frontend
-- React
-- React Router
-- Tailwind CSS (or your preferred styling)
-- TanstackQuery (for API calls)
+
+* Next.js
+* TypeScript
+* TanStack Query
+* Tailwind CSS
+* shadcn/ui
+* Lucide React
 
 ### Backend
-- Express.js
-- JWT for authentication
-- MongoDB 
 
-## 📥 How It Works
+* Hono
+* Cloudflare Workers
+* Cloudflare Workers AI
+* Prisma ORM
+* PostgreSQL (Neon)
+* pgvector
+* Zod
+* jose (JWT Authentication)
 
-1. **Sign In / Sign Up**  
-   Users create an account or log in.
+## Architecture
 
-2. **Add Content**  
-   In the dashboard, paste a YouTube or Twitter link, add a title, select the content type (YouTube or Twitter), and submit.
+```text
+Frontend (Next.js)
+        │
+        ▼
+Cloudflare Workers (Hono API)
+        │
+        ▼
+Cloudflare Workers AI
+(Embedding Generation)
+        │
+        ▼
+PostgreSQL + pgvector
+(Vector Storage & Similarity Search)
+```
 
-3. **View Dashboard**  
-   All saved links are displayed in a list for quick access.
+## How Semantic Search Works
 
-4. **Share**  
-   - Share a full "brain" (collection of saved links)
-   - Or share a single piece of content
-   - A unique public link is generated and copied to the clipboard
+### Saving Content
 
-5. **Public Page**  
-   Anyone with the link can view the shared content without logging in.
+1. User saves a link with title and description.
+2. A searchable text representation is generated.
+3. Cloudflare Workers AI generates a vector embedding.
+4. The embedding is stored in PostgreSQL using pgvector.
 
-## 🛠️ Getting Started
+```text
+Save Content
+      ↓
+Generate Embedding
+      ↓
+Store Vector
+      ↓
+Persist Metadata
+```
+
+### Searching Content
+
+1. User enters a search query.
+2. Query embedding is generated.
+3. pgvector performs similarity search.
+4. Most relevant content is returned.
+
+```text
+Search Query
+      ↓
+Generate Query Embedding
+      ↓
+Vector Similarity Search
+      ↓
+Rank Results
+      ↓
+Return Relevant Content
+```
+
+## Database Features
+
+* PostgreSQL relational data modeling
+* Prisma ORM with type-safe queries
+* pgvector for vector storage
+* Vector similarity search
+* Relational content, user, tag, and sharing models
+
+## Getting Started
 
 ### Prerequisites
 
-- Node.js
-- pnpm
-- MongoDB
+* Bun
+* Node.js 20+
+* Wrangler CLI
+* Neon PostgreSQL Database
+* Cloudflare Account with Workers AI enabled
 
 ### Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/devnick10/brainly-app.git
-cd brainly-app
+git clone https://github.com/devnick10/brainly_app.git
 
-# Install backend dependencies
-cd server
-pnpm install
+cd brainly_app
 
-# Install frontend dependencies
-cd ../frontend
-pnpm install
+# Frontend
+cd frontend
+bun install
+
+# Backend
+cd ../backend
+bun install
 ```
 
 ### Environment Variables
 
-Frontend Environment Variables ref from .env.local:
-Backend Environment Variables ref from .env.example:
+Frontend:
 
-### Run the App
-
-```bash
-# In one terminal
-cd server
-pnpm run dev
-
-# In another terminal
-cd frontend
-pnpm start
+```env
+VITE_BASE_URL=http://localhost:8787/api/v1
 ```
 
-## ✨ Future Enhancements
+Backend:
 
-- Add support for more platforms (e.g., Reddit, Instagram)
-- Implement tags or categories
-- User profiles and custom avatars
-- Search content
+```env
+DATABASE_URL=
+DIRECT_DATABASE_URL=
+JWT_SECRET=
+ACCESS_ORIGIN=
+```
 
-## 🧑‍💻 Author
+### Development
 
-- Your Name ([@devnick10](https://github.com/devnick10))
+Backend:
 
----
+```bash
+cd backend
+bun run dev
+```
 
-Enjoy using **Brainly App** — your personal content saver and sharer!
+Frontend:
+
+```bash
+cd frontend
+bun run dev
+```
+
+### Database
+
+Generate Prisma Client:
+
+```bash
+bun run generate
+```
+
+Apply Schema Changes:
+
+```bash
+bunx prisma db push
+```
+
+## API Routes
+
+| Method | Endpoint                   | Description                         |
+| ------ | -------------------------- | ----------------------------------- |
+| POST   | `/api/v1/user/signup`      | Create account                      |
+| POST   | `/api/v1/user/signin`      | Login user                          |
+| GET    | `/api/v1/brain`            | Fetch saved content                 |
+| POST   | `/api/v1/brain`            | Save content and generate embedding |
+| DELETE | `/api/v1/brain/:contentId` | Delete content                      |
+| GET    | `/api/v1/brain/search?q=`  | Semantic search                     |
+| POST   | `/api/v1/brain/share`      | Create or remove share link         |
+| GET    | `/api/v1/brain/:sharelink` | Access public shared collection     |
+
+## Future Improvements
+
+* Hybrid Search (Semantic + Full Text Search)
+* Content recommendations
+* AI-generated summaries
+* Multi-modal search
+* Personalized ranking
+* Content clustering
+
+## Key Learnings
+
+* Cloudflare Workers & Edge Computing
+* AI Embeddings and Semantic Search
+* PostgreSQL Vector Databases
+* Vector Similarity Search with pgvector
+* Retrieval-Augmented Search Patterns
+
+## Author
+
+GitHub: https://github.com/devnick10
