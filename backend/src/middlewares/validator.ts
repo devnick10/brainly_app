@@ -9,6 +9,6 @@ export const zValidator = <T extends z.ZodSchema, Target extends keyof Validatio
 ) =>
     zv(target, schema, (result, c) => {
         if (!result.success) {
-            throw new HTTPException(400, { cause: result.error })
+            throw new HTTPException(400, { message: result.error.toString() })
         }
     })

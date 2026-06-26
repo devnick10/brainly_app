@@ -1,21 +1,15 @@
-import { Hono, Context } from "hono"
+import { Hono } from "hono"
 import { HTTPException } from 'hono/http-exception'
-import { AppContext } from "../types"
-import { CreateContentSchema } from "../schema/brainSchema"
+import { authMiddleware } from "../middlewares/auth"
 import { zValidator } from "../middlewares/validator"
+import { CreateContentSchema } from "../schema/brainSchema"
+import { AppContext } from "../types"
 
 const brainRouter = new Hono<AppContext>()
 
-function requireUserId(c: Context<AppContext>): string {
-  const userId = c.get("userId")
-  if (!userId) {
-    throw new HTTPException(401, { message: "You are not logged in" })
-  }
-  return userId
-}
 
-brainRouter.get("/search", async (c) => {
-  const userId = requireUserId(c)
+brainRouter.get("/search", authMiddleware, async (c) => {
+  const userId = c.get("userId")
   const query = c.req.query('q')
   if (!query) {
     return c.json({ content: [] })
@@ -50,8 +44,8 @@ brainRouter.get("/search", async (c) => {
   return c.json({ content: results })
 })
 
-brainRouter.get("/", async (c) => {
-  const userId = requireUserId(c)
+brainRouter.get("/", authMiddleware, async (c) => {
+  const userId = c.get("userId")
   const prisma = c.get("prisma")
 
   const content = await prisma.content.findMany({
@@ -63,8 +57,9 @@ brainRouter.get("/", async (c) => {
   return c.json({ success: true, content })
 })
 
-brainRouter.post("/", zValidator('json', CreateContentSchema), async (c) => {
-  const userId = requireUserId(c)
+brainRouter.post("/", zValidator('json', CreateContentSchema), authMiddleware, async (c) => {
+  console.log("reach the route")
+  const userId = c.get("userId")
   const { link, title, description, type } = c.req.valid('json')
   const prisma = c.get("prisma")
 
@@ -99,8 +94,8 @@ brainRouter.post("/", zValidator('json', CreateContentSchema), async (c) => {
   })
 })
 
-brainRouter.delete("/:contentId", async (c) => {
-  const userId = requireUserId(c)
+brainRouter.delete("/:contentId", authMiddleware, async (c) => {
+  const userId = c.get("userId")
   const prisma = c.get("prisma")
   const contentId = c.req.param('contentId')
 
@@ -118,8 +113,8 @@ brainRouter.delete("/:contentId", async (c) => {
   })
 })
 
-brainRouter.post("/share", async (c) => {
-  const userId = requireUserId(c)
+brainRouter.post("/share", authMiddleware, async (c) => {
+  const userId = c.get("userId")
   const prisma = c.get("prisma")
   let share: boolean
   try {
@@ -168,4 +163,5 @@ brainRouter.get("/:sharelink", async (c) => {
   return c.json({ success: true, content })
 })
 
-export { brainRouter };
+export { brainRouter }
+

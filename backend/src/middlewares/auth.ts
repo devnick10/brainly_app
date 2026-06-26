@@ -1,12 +1,13 @@
 import { createMiddleware } from 'hono/factory'
 import { jwtVerify } from 'jose'
 import { AppContext } from '../types'
+import { HTTPException } from 'hono/http-exception'
 
 export const authMiddleware = createMiddleware<AppContext>(async (c, next) => {
   const authHeader = c.req.header('Authorization')
 
   if (authHeader?.startsWith('Bearer ')) {
-    const token = authHeader.slice(7)
+    const token = authHeader.split(' ')[1]
     try {
       const { payload } = await jwtVerify(
         token,
@@ -14,7 +15,7 @@ export const authMiddleware = createMiddleware<AppContext>(async (c, next) => {
       )
       c.set("userId", payload.id as string)
     } catch {
-      // invalid token - continue without userId
+      throw new HTTPException(401, { message: "Unauthorized" })
     }
   }
 
