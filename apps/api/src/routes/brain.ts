@@ -5,6 +5,7 @@ import { zValidator } from "../middlewares/validator"
 import { CreateContentSchema } from "../schema/brainSchema"
 import { AppContext } from "../types"
 import { getMetadata } from "../metadata"
+import { generateEmbedding } from "../lib/embeddings"
 
 const brainRouter = new Hono<AppContext>()
 
@@ -51,8 +52,11 @@ brainRouter.get("/", authMiddleware, async (c) => {
 
   const content = await prisma.content.findMany({
     where: { userId },
-    include: { tags: true },
-    orderBy: { createdAt: 'desc' }
+    include: { tags: true, },
+    orderBy: { createdAt: 'desc' },
+    omit: {
+      searchableText: true,
+    },
   })
 
   return c.json({ success: true, content })
@@ -62,34 +66,46 @@ brainRouter.post("/", zValidator('json', CreateContentSchema), authMiddleware, a
   const userId = c.get("userId")
   let { link, title, description, type } = c.req.valid('json')
   const prisma = c.get("prisma")
+  try {
+    const metadata = await getMetadata(link)
+    const searchableText = metadata.searchableText;
 
+    const embedding = await generateEmbedding(searchableText, c.env.AI);
 
-  const metadata = await getMetadata(link)
-  const searchableText = metadata.searchableText;
-  const embedding = await generateEmbedding(searchableText, c.env.AI);
+    // Create the content entry in the database
+    try {
+      const content = await prisma.content.create({
+        data: {
+          link,
+          title,
+          description,
+          type,
+          searchableText,
+          imageUrl: metadata.imageUrl || null,
+          siteName: metadata.siteName || null,
+          author: metadata.author || null,
+          userId
+        }
+      })
 
-  // Create the content entry in the database
-  const content = await prisma.content.create({
-    data: {
-      link,
-      title,
-      description,
-      type,
-      searchableText,
-      userId
+      // Store the embedding in the database using raw SQL
+      await prisma.$executeRawUnsafe(
+        `UPDATE "Content" SET embedding = $1::vector WHERE id = $2`,
+        embedding,
+        content.id
+      )
+    } catch (error) {
+      console.error("Error creating content:", error);
+      throw new HTTPException(500, { message: "Failed to create content" });
     }
-  })
 
-  // Store the embedding in the database using raw SQL
-  await prisma.$executeRawUnsafe(
-    `UPDATE "Content" SET embedding = $1::vector WHERE id = $2`,
-    embedding,
-    content.id
-  )
-
-  return c.json({
-    message: 'Content created successfully',
-  })
+    return c.json({
+      message: 'Content created successfully',
+    })
+  } catch (error) {
+    console.error("Error creating content:", error);
+    return c.json({ message: 'Failed to create content' }, 500);
+  }
 })
 
 brainRouter.delete("/:contentId", authMiddleware, async (c) => {

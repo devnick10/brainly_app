@@ -1,4 +1,5 @@
 {
+  "name": "brainly",
   "private": true,
   "workspaces": [
     "apps/*",
