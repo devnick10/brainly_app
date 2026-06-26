@@ -5,7 +5,7 @@ import { toast } from "sonner"
 import { getContent } from "../api/getContent"
 import { createLink } from "../api/createLink"
 import { ContentCard } from "../components/Card"
-import { CreateContentModel } from "../components/CreateContentModel"
+import { CreateContentModel, type ContentType } from "../components/CreateContentModel"
 import { SideBar } from "../components/SideBar"
 import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
@@ -148,7 +148,7 @@ export function Dashboard() {
                 <ContentCard
                   key={id}
                   id={id}
-                  type={type as "youtube" | "twitter"}
+                  type={type as ContentType}
                   title={title}
                   link={link}
                 />

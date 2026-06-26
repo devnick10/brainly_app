@@ -25,12 +25,12 @@ interface CreateContentModelProps {
   open: boolean
   onClose: () => void
 }
-
+export type ContentType = "YOUTUBE" | "TWITTER" | "ARTICLE" | "DOCUMENT"
 export function CreateContentModel({ open, onClose }: CreateContentModelProps) {
   const queryClient = useQueryClient()
   const [title, setTitle] = useState("")
   const [link, setLink] = useState("")
-  const [type, setType] = useState("")
+  const [type, setType] = useState<ContentType>("YOUTUBE")
 
   const { mutate, isPending } = useMutation({
     mutationFn: addContent,
@@ -39,7 +39,7 @@ export function CreateContentModel({ open, onClose }: CreateContentModelProps) {
       queryClient.invalidateQueries({ queryKey: ['content'] })
       setTitle("")
       setLink("")
-      setType("")
+      setType("YOUTUBE")
       onClose()
     },
     onError: () => {
@@ -85,13 +85,15 @@ export function CreateContentModel({ open, onClose }: CreateContentModelProps) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="type">Content Type</Label>
-            <Select value={type} onValueChange={setType}>
+            <Select value={type} onValueChange={(value) => setType(value as ContentType)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select content type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="youtube">YouTube</SelectItem>
-                <SelectItem value="twitter">Twitter</SelectItem>
+                <SelectItem value="YOUTUBE">YouTube</SelectItem>
+                <SelectItem value="TWITTER">Twitter</SelectItem>
+                <SelectItem value="ARTICLE">Article</SelectItem>
+                <SelectItem value="DOCUMENT">Document</SelectItem>
               </SelectContent>
             </Select>
           </div>
