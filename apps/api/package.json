@@ -1,0 +1,24 @@
+{
+  "name": "brainly_api",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+  },
+  "dependencies": {
+    "@brainly/db": "*",
+    "@hono/zod-validator": "^0.8.0",
+    "cheerio": "^1.2.0",
+    "dotenv": "^17.4.2",
+    "hono": "^4.12.26",
+    "jose": "^6.2.3",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260624.1",
+    "dotenv-cli": "^11.0.0",
+    "typescript": "^6.0.3",
+    "wrangler": "^4.4.0"
+  }
+}

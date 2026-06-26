@@ -1,0 +1,17 @@
+{
+  "name": "brainly",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint"
+  },
+  "packageManager": "bun@3.10.0",
+  "devDependencies": {
+    "turbo": "^2.10.0"
+  }
+}

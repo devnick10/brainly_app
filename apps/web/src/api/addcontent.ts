@@ -1,0 +1,18 @@
+import type { ContentData } from "../lib/types";
+
+export async function addContent(data: Omit<ContentData, 'searchableText'>) {
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/brain`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${String(localStorage.getItem('token'))}`,
+        },
+        body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to add content');
+    }
+
+    return await response.json();
+}
