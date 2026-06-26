@@ -1,27 +1,32 @@
 import { useEffect, useState, useMemo } from "react"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { Plus, Share2, Search } from "lucide-react"
+import { Menu, Plus, Share2, Search } from "lucide-react"
 import { toast } from "sonner"
 import { getContent } from "../api/getContent"
 import { createLink } from "../api/createLink"
-import { ContentCard } from "../components/Card"
-import { CreateContentModel, type ContentType } from "../components/CreateContentModel"
+import { ContentCard } from "../components/ContentCard"
+import { CreateContentModel } from "../components/CreateContentModel"
 import { SideBar } from "../components/SideBar"
 import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
-import type { Content } from "../lib/types"
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "../components/ui/sheet"
+import type { Content, ContentType } from "../lib/types"
 
 export function Dashboard() {
   const [modelOpen, setModelOpen] = useState(false)
   const [contentData, setContentData] = useState<Content[]>([])
-  const [activeFilter, setActiveFilter] = useState<"all" | "youtube" | "twitter">("all")
+  const [activeFilter, setActiveFilter] = useState<"all" | ContentType>("all")
   const [searchQuery, setSearchQuery] = useState("")
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["content"],
     queryFn: getContent,
   })
-
+  console.log(contentData)
   useEffect(() => {
     if (data) {
       setContentData(data?.content || [])
@@ -58,28 +63,45 @@ export function Dashboard() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <aside className="hidden w-64 border-r bg-card sm:block">
+      <aside className="hidden w-64 border-r bg-card lg:block">
         <SideBar
-          tweet={() => setActiveFilter("twitter")}
-          youtube={() => setActiveFilter("youtube")}
+          tweet={() => setActiveFilter("TWITTER")}
+          youtube={() => setActiveFilter("YOUTUBE")}
           all={() => setActiveFilter("all")}
           activeFilter={activeFilter}
         />
       </aside>
       <main className="flex flex-1 flex-col overflow-hidden">
-        <header className="border-b bg-card px-6 py-4">
+        <header className="border-b bg-card px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center justify-between gap-4">
-            <div>
-              <h1 className="text-xl font-semibold">
-                {activeFilter === "all"
-                  ? "All Notes"
-                  : activeFilter === "youtube"
-                    ? "YouTube Videos"
-                    : "Twitter Posts"}
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                {filteredData.length} item{filteredData.length !== 1 ? "s" : ""}
-              </p>
+            <div className="flex items-center gap-3">
+              <Sheet>
+                <SheetTrigger asChild className="lg:hidden">
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-64 p-0">
+                  <SideBar
+                    tweet={() => setActiveFilter("TWITTER")}
+                    youtube={() => setActiveFilter("YOUTUBE")}
+                    all={() => setActiveFilter("all")}
+                    activeFilter={activeFilter}
+                  />
+                </SheetContent>
+              </Sheet>
+              <div>
+                <h1 className="text-xs  text-wrap font-semibold sm:text-xl">
+                  {activeFilter === "all"
+                    ? "All Notes"
+                    : activeFilter === "YOUTUBE"
+                      ? "YouTube Videos"
+                      : "Twitter Posts"}
+                </h1>
+                {/* <p className="text-sm text-muted-foreground">
+                  {filteredData.length} item{filteredData.length !== 1 ? "s" : ""}
+                </p> */}
+              </div>
             </div>
             <div className="flex items-center gap-3">
               <div className="relative hidden sm:block">
@@ -88,19 +110,22 @@ export function Dashboard() {
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-64 pl-9"
+                  className="w-48 pl-9 lg:w-64"
                 />
               </div>
               <Button
                 variant="outline"
+                className="hidden sm:flex"
                 onClick={() => shareMutate({ share: true })}
                 disabled={isSharing}
               >
-                <Share2 className="mr-2 h-4 w-4" />
+                <Share2 className="mr-2 size-1 sm:size-6" />
                 Share
               </Button>
-              <Button onClick={() => setModelOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
+              <Button
+                size="sm"
+                onClick={() => setModelOpen(true)}>
+                <Plus className="mr-2 size-1 sm:size-6" />
                 Add Content
               </Button>
             </div>
@@ -144,13 +169,10 @@ export function Dashboard() {
           )}
           {!isLoading && !error && filteredData.length > 0 && (
             <div className="flex flex-wrap gap-4">
-              {filteredData.map(({ type, title, link, id }) => (
+              {filteredData.map((content) => (
                 <ContentCard
-                  key={id}
-                  id={id}
-                  type={type as ContentType}
-                  title={title}
-                  link={link}
+                  key={content.id}
+                  {...content}
                 />
               ))}
             </div>

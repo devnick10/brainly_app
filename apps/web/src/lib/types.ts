@@ -1,28 +1,35 @@
-interface ContentData {
+export type ContentType = "YOUTUBE" | "TWITTER" | "ARTICLE" | "DOCUMENT"
+
+export interface ContentPayload {
   title: string;
-  link: string;
-  type: string;
+  description?: string
+  type: ContentType;
+  link: string
 }
 
-interface UserData {
+export interface UserData {
   email: string;
   password: string;
 }
 
-interface AuthLayoutProps {
+export interface AuthLayoutProps {
   children: React.ReactNode;
   title: string;
   subtitle: string;
 }
 
-interface Content {
+export interface Content {
   id: string;
   link: string;
   title: string;
-  type: "youtube" | "twitter";
+  description?: string
+  type: ContentType;
+  searchableText: string
+  imageUrl?: string
+  siteName?: string
+  author?: string
   tags: { id: string; title: string }[];
   userId: string;
   user?: { email: string };
 }
 
-export type { ContentData, UserData, AuthLayoutProps, Content }

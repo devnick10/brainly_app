@@ -20,12 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select"
+import type { ContentType } from "@/lib/types"
 
 interface CreateContentModelProps {
   open: boolean
   onClose: () => void
 }
-export type ContentType = "YOUTUBE" | "TWITTER" | "ARTICLE" | "DOCUMENT"
+
 export function CreateContentModel({ open, onClose }: CreateContentModelProps) {
   const queryClient = useQueryClient()
   const [title, setTitle] = useState("")

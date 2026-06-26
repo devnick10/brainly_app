@@ -1,12 +1,17 @@
 import { useQuery } from "@tanstack/react-query"
 import { useEffect, useState, useMemo } from "react"
 import { useParams, Link } from "react-router-dom"
-import { Brain, ArrowLeft, Search } from "lucide-react"
-import { ContentCard } from "../components/Card"
+import { Menu, Brain, ArrowLeft, Search } from "lucide-react"
+import { ContentCard } from "../components/ContentCard"
 import { SideBar } from "../components/SideBar"
 import { sharedBrain } from "../api/sharedBrain"
 import { Input } from "../components/ui/input"
 import { Button } from "../components/ui/button"
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "../components/ui/sheet"
 import type { Content } from "../lib/types"
 
 export function SharedDashboard() {
@@ -44,7 +49,7 @@ export function SharedDashboard() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <aside className="hidden w-64 border-r bg-card sm:block">
+      <aside className="hidden w-64 border-r bg-card lg:block">
         <SideBar
           shared
           tweet={() => setActiveFilter("twitter")}
@@ -54,9 +59,25 @@ export function SharedDashboard() {
         />
       </aside>
       <main className="flex flex-1 flex-col overflow-hidden">
-        <header className="border-b bg-card px-6 py-4">
+        <header className="border-b bg-card px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <Sheet>
+                <SheetTrigger asChild className="lg:hidden">
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-64 p-0">
+                  <SideBar
+                    shared
+                    tweet={() => setActiveFilter("twitter")}
+                    youtube={() => setActiveFilter("youtube")}
+                    all={() => setActiveFilter("all")}
+                    activeFilter={activeFilter}
+                  />
+                </SheetContent>
+              </Sheet>
               <Button variant="ghost" size="icon" asChild>
                 <Link to="/">
                   <ArrowLeft className="h-4 w-4" />
@@ -65,7 +86,7 @@ export function SharedDashboard() {
               <div>
                 <div className="flex items-center gap-2">
                   <Brain className="h-5 w-5 text-primary" />
-                  <h1 className="text-xl font-semibold">Shared Brain</h1>
+                  <h1 className="text-lg font-semibold sm:text-xl">Shared Brain</h1>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {filteredData.length} item{filteredData.length !== 1 ? "s" : ""}
@@ -78,7 +99,7 @@ export function SharedDashboard() {
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-64 pl-9"
+                className="w-48 pl-9 lg:w-64"
               />
             </div>
           </div>

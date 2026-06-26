@@ -1,5 +1,6 @@
+import type { Content } from "@/lib/types";
 
-export async function getContent() {
+export async function getContent():Promise<{success:boolean, content: Content[]}> {
 
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}/brain`, {
         method: "GET",

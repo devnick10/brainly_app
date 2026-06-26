@@ -3,22 +3,24 @@ import { Brain, Home, Twitter, Youtube, LogOut } from "lucide-react"
 import { cn } from "../lib/utils"
 import { Button } from "./ui/button"
 import { Separator } from "./ui/separator"
+import type { ContentType } from "@/lib/types"
 
 interface SideBarProps {
   shared?: boolean
   tweet: () => void
   youtube: () => void
   all: () => void
-  activeFilter: "all" | "youtube" | "twitter"
+  activeFilter: "all" | ContentType
+  onNav?: () => void
 }
 
-export function SideBar({ shared, tweet, youtube, all, activeFilter }: SideBarProps) {
+export function SideBar({ shared, tweet, youtube, all, activeFilter, onNav }: SideBarProps) {
   const navigate = useNavigate()
 
   const items = [
-    { label: "All Notes", icon: Home, onClick: all, value: "all" as const },
-    { label: "Twitter", icon: Twitter, onClick: tweet, value: "twitter" as const },
-    { label: "YouTube", icon: Youtube, onClick: youtube, value: "youtube" as const },
+    { label: "All Notes", icon: Home, onClick: () => { all(); onNav?.(); }, value: "all" as const },
+    { label: "Twitter", icon: Twitter, onClick: () => { tweet(); onNav?.(); }, value: "TWITTER" as const },
+    { label: "YouTube", icon: Youtube, onClick: () => { youtube(); onNav?.(); }, value: "YOUTUBE" as const },
   ]
 
   return (
