@@ -4,6 +4,7 @@ import { authMiddleware } from "../middlewares/auth"
 import { zValidator } from "../middlewares/validator"
 import { CreateContentSchema } from "../schema/brainSchema"
 import { AppContext } from "../types"
+import { getMetadata } from "../metadata"
 
 const brainRouter = new Hono<AppContext>()
 
@@ -58,20 +59,16 @@ brainRouter.get("/", authMiddleware, async (c) => {
 })
 
 brainRouter.post("/", zValidator('json', CreateContentSchema), authMiddleware, async (c) => {
-  console.log("reach the route")
   const userId = c.get("userId")
-  const { link, title, description, type } = c.req.valid('json')
+  let { link, title, description, type } = c.req.valid('json')
   const prisma = c.get("prisma")
 
-  const searchableText = [title, description, link].filter(Boolean).join(" ")
 
-  const aiResponse = await c.env.AI.run(
-    "@cf/baai/bge-base-en-v1.5",
-    { text: [searchableText] }
-  )
-  const embedding = (aiResponse as { data: number[][] }).data[0]
-  const embeddingStr = `[${embedding.join(',')}]`
+  const metadata = await getMetadata(link)
+  const searchableText = metadata.searchableText;
+  const embedding = await generateEmbedding(searchableText, c.env.AI);
 
+  // Create the content entry in the database
   const content = await prisma.content.create({
     data: {
       link,
@@ -83,9 +80,10 @@ brainRouter.post("/", zValidator('json', CreateContentSchema), authMiddleware, a
     }
   })
 
+  // Store the embedding in the database using raw SQL
   await prisma.$executeRawUnsafe(
     `UPDATE "Content" SET embedding = $1::vector WHERE id = $2`,
-    embeddingStr,
+    embedding,
     content.id
   )
 

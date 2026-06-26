@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client"
+  runtime  = "cloudflare"
   output   = "../src/generated/prisma"
 }
 
@@ -39,6 +40,11 @@ model Content {
 
   embedding Unsupported("vector(768)")?
 
+  imageUrl    String?
+  siteName    String?
+  author      String?
+  publishedAt DateTime?
+
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -46,6 +52,7 @@ model Content {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   @@unique([userId, title])
 }
 
