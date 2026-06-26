@@ -1,6 +1,6 @@
-import type { ContentData } from "../lib/types";
+import type { ContentPayload } from "../lib/types";
 
-export async function addContent(data: Omit<ContentData, 'searchableText'>) {
+export async function addContent(data: ContentPayload) {
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}/brain`, {
         method: "POST",
         headers: {

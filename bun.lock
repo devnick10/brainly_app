@@ -70,7 +70,6 @@
       },
       "devDependencies": {
         "@types/bun": "latest",
-        "@types/node": "^26.0.1",
         "@types/pg": "^8.20.0",
         "tsx": "^4.22.4",
       },

@@ -16,7 +16,7 @@ import type { Content } from "../lib/types"
 
 export function SharedDashboard() {
   const [contentData, setContentData] = useState<Content[]>([])
-  const [activeFilter, setActiveFilter] = useState<"all" | "youtube" | "twitter">("all")
+  const [activeFilter, setActiveFilter] = useState<"all" | "YOUTUBE" | "TWITTER">("all")
   const [searchQuery, setSearchQuery] = useState("")
   const params = useParams()
 
@@ -52,8 +52,8 @@ export function SharedDashboard() {
       <aside className="hidden w-64 border-r bg-card lg:block">
         <SideBar
           shared
-          tweet={() => setActiveFilter("twitter")}
-          youtube={() => setActiveFilter("youtube")}
+          tweet={() => setActiveFilter("TWITTER")}
+          youtube={() => setActiveFilter("YOUTUBE")}
           all={() => setActiveFilter("all")}
           activeFilter={activeFilter}
         />
@@ -71,8 +71,8 @@ export function SharedDashboard() {
                 <SheetContent side="left" className="w-64 p-0">
                   <SideBar
                     shared
-                    tweet={() => setActiveFilter("twitter")}
-                    youtube={() => setActiveFilter("youtube")}
+                    tweet={() => setActiveFilter("TWITTER")}
+                    youtube={() => setActiveFilter("YOUTUBE")}
                     all={() => setActiveFilter("all")}
                     activeFilter={activeFilter}
                   />
@@ -124,13 +124,10 @@ export function SharedDashboard() {
           )}
           {!isLoading && !error && filteredData.length > 0 && (
             <div className="flex flex-wrap gap-4">
-              {filteredData.map(({ type, title, link, id }) => (
+              {filteredData.map((content) => (
                 <ContentCard
-                  key={id}
-                  id={id}
-                  type={type as "youtube" | "twitter"}
-                  title={title}
-                  link={link}
+                  key={content.id}
+                  {...content}
                 />
               ))}
             </div>
