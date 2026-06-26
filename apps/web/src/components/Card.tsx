@@ -19,7 +19,7 @@ import {
   CardTitle,
 } from "./ui/card"
 import type { ContentType } from "./CreateContentModel"
-import { getYoutubeThumbnail } from "@/utils/getYoutubeThumbnail"
+import { getYoutubeThumbnail } from "@/lib/getYoutubeThumbnail"
 
 interface CardProps {
   type: ContentType

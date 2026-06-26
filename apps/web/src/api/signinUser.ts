@@ -1,4 +1,4 @@
-import type { UserData } from "../utils/types";
+import type { UserData } from "../lib/types";
 
 export async function signinUser(data: UserData) {
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}/user/signin`, {

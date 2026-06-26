@@ -1,4 +1,4 @@
-import type { UserData } from "../utils/types";
+import type { UserData } from "../lib/types";
 
 
 export async function signupUser(data: UserData) {

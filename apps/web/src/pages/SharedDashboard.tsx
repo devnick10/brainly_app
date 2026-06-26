@@ -7,7 +7,7 @@ import { SideBar } from "../components/SideBar"
 import { sharedBrain } from "../api/sharedBrain"
 import { Input } from "../components/ui/input"
 import { Button } from "../components/ui/button"
-import type { Content } from "../utils/types"
+import type { Content } from "../lib/types"
 
 export function SharedDashboard() {
   const [contentData, setContentData] = useState<Content[]>([])

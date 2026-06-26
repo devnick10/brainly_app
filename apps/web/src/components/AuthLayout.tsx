@@ -1,6 +1,6 @@
 import { Brain } from "lucide-react"
 import { Link } from "react-router-dom"
-import type { AuthLayoutProps } from "../utils/types"
+import type { AuthLayoutProps } from "../lib/types"
 import { Card, CardContent } from "./ui/card"
 
 export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {

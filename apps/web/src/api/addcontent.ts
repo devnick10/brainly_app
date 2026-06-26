@@ -1,4 +1,4 @@
-import type { ContentData } from "../utils/types";
+import type { ContentData } from "../lib/types";
 
 export async function addContent(data: ContentData) {
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}/brain`, {

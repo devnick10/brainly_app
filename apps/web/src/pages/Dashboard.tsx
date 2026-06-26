@@ -9,7 +9,7 @@ import { CreateContentModel, type ContentType } from "../components/CreateConten
 import { SideBar } from "../components/SideBar"
 import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
-import type { Content } from "../utils/types"
+import type { Content } from "../lib/types"
 
 export function Dashboard() {
   const [modelOpen, setModelOpen] = useState(false)
