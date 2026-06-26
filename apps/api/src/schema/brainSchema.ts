@@ -1,5 +1,10 @@
 import z, { string } from "zod";
-import { ContentType } from "../generated/prisma/enums";
+export const ContentType = {
+  YOUTUBE: 'YOUTUBE',
+  TWITTER: 'TWITTER',
+  ARTICLE: 'ARTICLE',
+  DOCUMENT: 'DOCUMENT'
+} as const
 const CreateContentSchema = z.object({
     link: z.string(),
     title: z.string(),
