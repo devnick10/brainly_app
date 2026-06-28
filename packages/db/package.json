@@ -4,8 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "migrate": "prisma migrate dev",
-    "generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate",
     "studio": "prisma studio"
   },
   "exports": {
