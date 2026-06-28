@@ -110,11 +110,16 @@ export const ContentCard: React.FC<ContentCardProps> = (props: ContentCardProps)
 
         {props.type === "TWITTER" && (
           <div className="bg-muted rounded-md p-4 text-sm text-muted-foreground">
-            <blockquote className="twitter-tweet">
-              <a href={props.link.replace("x.com", "twitter.com")}>
-                View on Twitter
-              </a>
-            </blockquote>
+            {props.imageUrl &&
+              <div className="relative">
+                <img
+                  src={props.imageUrl}
+                  alt={props.title}
+                  className="w-full aspect-video object-cover rounded-md"
+                  loading="lazy"
+                />
+              </div>
+            }
           </div>
         )}
 
@@ -128,13 +133,8 @@ export const ContentCard: React.FC<ContentCardProps> = (props: ContentCardProps)
                   className="w-full aspect-video object-cover rounded-md"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-md">
-                  <Play className="h-12 w-12 text-white fill-white" />
-                </div>
               </div>
-
             }
-            <p>Article content cannot be previewed.</p>
           </div>
         )}
 
