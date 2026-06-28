@@ -1,4 +1,4 @@
-import type { ExtendedPrismaClient } from "./lib/prisma";
+import type { ExtendedPrismaClient } from "@brainly/db";
 
 export type Bindings = {
   ACCESS_ORIGIN: string

@@ -5,19 +5,21 @@ export const ContentType = {
   ARTICLE: 'ARTICLE',
   DOCUMENT: 'DOCUMENT'
 } as const
+
 const CreateContentSchema = z.object({
     link: z.string(),
     title: z.string(),
     description: z.string().optional(),
-    type: z.enum(ContentType)
+    type: z.enum(ContentType),
+    tags: z.array(z.string()).optional()
 })
 
 const DeleteContentSchema = z.object({
-    contentId: string
+    contentId: z.string()
 })
 
 export {
     CreateContentSchema,
-    DeleteContentSchema
-};
+    DeleteContentSchema,
+}   
 

@@ -12,12 +12,15 @@ const app = new Hono<AppContext>()
 app.use('*', cors({
   origin: (origin, c) => {
     const ctx = c;
+    if (origin === c.env.DEV_ACCESS_ORIGIN) {
+      return origin
+    }
     return ctx.env?.ACCESS_ORIGIN || origin
   },
   credentials: true,
 }))
 
-app.use('*', createMiddleware<AppContext>(async (c, next) => {
+app.use('/api/*', createMiddleware<AppContext>(async (c, next) => {
   const prisma = createPrismaClient(c.env.DATABASE_URL)
   c.set("prisma", prisma)
   await next()

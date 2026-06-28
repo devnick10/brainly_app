@@ -64,17 +64,17 @@ brainRouter.get("/", authMiddleware, async (c) => {
 
 brainRouter.post("/", zValidator('json', CreateContentSchema), authMiddleware, async (c) => {
   const userId = c.get("userId")
-  let { link, title, description, type } = c.req.valid('json')
+  let { link, title, description, type, tags } = c.req.valid('json')
   const prisma = c.get("prisma")
+
   try {
     const metadata = await getMetadata(link)
     const searchableText = metadata.searchableText;
-
     const embedding = await generateEmbedding(searchableText, c.env.AI);
 
     // Create the content entry in the database
-    try {
-      const content = await prisma.content.create({
+    await prisma.$transaction(async (tx) => {
+      const newContent = await tx.content.create({
         data: {
           link,
           title,
@@ -84,27 +84,28 @@ brainRouter.post("/", zValidator('json', CreateContentSchema), authMiddleware, a
           imageUrl: metadata.imageUrl || null,
           siteName: metadata.siteName || null,
           author: metadata.author || null,
-          userId
+          userId,
+          ...(tags?.length && {
+            tags: {
+              connectOrCreate: tags.map((tag) => ({
+                where: { title: tag },
+                create: { title: tag },
+              })),
+            },
+          }),
         }
       })
-
       // Store the embedding in the database using raw SQL
-      await prisma.$executeRawUnsafe(
-        `UPDATE "Content" SET embedding = $1::vector WHERE id = $2`,
-        embedding,
-        content.id
-      )
-    } catch (error) {
-      console.error("Error creating content:", error);
-      throw new HTTPException(500, { message: "Failed to create content" });
-    }
+      await tx.$executeRaw
+        `UPDATE "Content" SET ${embedding}::vector WHERE id = ${newContent.id}`
+    })
 
     return c.json({
       message: 'Content created successfully',
     })
   } catch (error) {
     console.error("Error creating content:", error);
-    return c.json({ message: 'Failed to create content' }, 500);
+    throw new HTTPException(500, { message: "Failed to create content" });
   }
 })
 

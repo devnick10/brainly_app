@@ -36,6 +36,6 @@
   //   "head_sampling_rate": 1
   // }
   "secrets": {
-    "required": ["JWT_SECRET", "DATABASE_URL", "ACCESS_ORIGIN"],
+    "required": ["JWT_SECRET", "DATABASE_URL", "ACCESS_ORIGIN", "DEV_ACCESS_ORIGIN"],
   }
 }
