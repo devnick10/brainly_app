@@ -9,7 +9,7 @@ export async function signinUser(data: UserData) {
     credentials: 'include',
     body: JSON.stringify(data),
   });
-  console.log(response);
+
   if (!response.ok) {
     throw new Error('Signup failed');
   }
