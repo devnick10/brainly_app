@@ -12,7 +12,7 @@
     "db:generate": "turbo db:generate",
     "format": "turbo run format",
     "format:fix": "prettier --write \".\"",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "lint-staged": {
     "apps/web/**/*.{js,jsx,ts,tsx}": [
