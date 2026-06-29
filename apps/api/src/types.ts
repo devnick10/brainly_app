@@ -1,15 +1,16 @@
-import type { ExtendedPrismaClient } from "@brainly/db";
+import type { ExtendedPrismaClient } from '@brainly/db';
 
 export type Bindings = {
-  ACCESS_ORIGIN: string
-  DATABASE_URL: string
-  JWT_SECRET: string
+  ACCESS_ORIGIN: string;
+  DATABASE_URL: string;
+  JWT_SECRET: string;
   AI: Ai;
-}
+};
 
 export type AppContext = {
-  Bindings: Bindings, Variables: {
+  Bindings: Bindings;
+  Variables: {
     prisma: ExtendedPrismaClient;
-    userId: string
+    userId: string;
   };
-}
+};

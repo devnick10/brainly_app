@@ -3,9 +3,7 @@
   "name": "brainly-api",
   "main": "src/index.ts",
   "compatibility_date": "2026-06-22",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["nodejs_compat"],
   // "vars": {
   //   "MY_VAR": "my-variable"
   // },
@@ -29,13 +27,18 @@
   //   }
   // ],
   "ai": {
-    "binding": "AI"
+    "binding": "AI",
   },
   // "observability": {
   //   "enabled": true,
   //   "head_sampling_rate": 1
   // }
   "secrets": {
-    "required": ["JWT_SECRET", "DATABASE_URL", "ACCESS_ORIGIN", "DEV_ACCESS_ORIGIN"],
-  }
+    "required": [
+      "JWT_SECRET",
+      "DATABASE_URL",
+      "ACCESS_ORIGIN",
+      "DEV_ACCESS_ORIGIN",
+    ],
+  },
 }
