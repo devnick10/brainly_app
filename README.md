@@ -4,37 +4,37 @@ Brainly is an AI-powered content bookmarking platform that helps users save, org
 
 ## Features
 
-* Secure user authentication using JWT
-* Save content from YouTube, X (Twitter), articles, and documents
-* Organize content with tags and categories
-* AI-powered semantic search using vector embeddings
-* Find saved content using natural language queries
-* Public sharing of your entire content collection
-* Unique shareable links for collaboration and discovery
-* Responsive dashboard for managing saved content
-* Fast vector similarity search powered by pgvector
+- Secure user authentication using JWT
+- Save content from YouTube, X (Twitter), articles, and documents
+- Organize content with tags and categories
+- AI-powered semantic search using vector embeddings
+- Find saved content using natural language queries
+- Public sharing of your entire content collection
+- Unique shareable links for collaboration and discovery
+- Responsive dashboard for managing saved content
+- Fast vector similarity search powered by pgvector
 
 ## Tech Stack
 
 ### Frontend
 
-* Next.js
-* TypeScript
-* TanStack Query
-* Tailwind CSS
-* shadcn/ui
-* Lucide React
+- Next.js
+- TypeScript
+- TanStack Query
+- Tailwind CSS
+- shadcn/ui
+- Lucide React
 
 ### Backend
 
-* Hono
-* Cloudflare Workers
-* Cloudflare Workers AI
-* Prisma ORM
-* PostgreSQL (Neon)
-* pgvector
-* Zod
-* jose (JWT Authentication)
+- Hono
+- Cloudflare Workers
+- Cloudflare Workers AI
+- Prisma ORM
+- PostgreSQL (Neon)
+- pgvector
+- Zod
+- jose (JWT Authentication)
 
 ## Architecture
 
@@ -93,21 +93,21 @@ Return Relevant Content
 
 ## Database Features
 
-* PostgreSQL relational data modeling
-* Prisma ORM with type-safe queries
-* pgvector for vector storage
-* Vector similarity search
-* Relational content, user, tag, and sharing models
+- PostgreSQL relational data modeling
+- Prisma ORM with type-safe queries
+- pgvector for vector storage
+- Vector similarity search
+- Relational content, user, tag, and sharing models
 
 ## Getting Started
 
 ### Prerequisites
 
-* Bun
-* Node.js 20+
-* Wrangler CLI
-* Neon PostgreSQL Database
-* Cloudflare Account with Workers AI enabled
+- Bun
+- Node.js 20+
+- Wrangler CLI
+- Neon PostgreSQL Database
+- Cloudflare Account with Workers AI enabled
 
 ### Installation
 
@@ -187,20 +187,20 @@ bunx prisma db push
 
 ## Future Improvements
 
-* Hybrid Search (Semantic + Full Text Search)
-* Content recommendations
-* AI-generated summaries
-* Multi-modal search
-* Personalized ranking
-* Content clustering
+- Hybrid Search (Semantic + Full Text Search)
+- Content recommendations
+- AI-generated summaries
+- Multi-modal search
+- Personalized ranking
+- Content clustering
 
 ## Key Learnings
 
-* Cloudflare Workers & Edge Computing
-* AI Embeddings and Semantic Search
-* PostgreSQL Vector Databases
-* Vector Similarity Search with pgvector
-* Retrieval-Augmented Search Patterns
+- Cloudflare Workers & Edge Computing
+- AI Embeddings and Semantic Search
+- PostgreSQL Vector Databases
+- Vector Similarity Search with pgvector
+- Retrieval-Augmented Search Patterns
 
 ## Author
 

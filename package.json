@@ -9,10 +9,29 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
-    "db:generate": "turbo db:generate"
+    "db:generate": "turbo db:generate",
+    "format": "turbo run format",
+    "format:fix": "prettier --write \".\"",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "apps/web/**/*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "eslint --config apps/web/eslint.config.js --fix"
+    ],
+    "apps/api/**/*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "eslint --config apps/api/eslint.config.js --fix"
+    ],
+    "**/*": [
+      "prettier --write"
+    ]
   },
   "packageManager": "bun@1.2.18",
   "devDependencies": {
-    "turbo": "^2.10.0"
+    "turbo": "^2.10.0",
+    "prettier": "^3.0.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0"
   }
 }

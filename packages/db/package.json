@@ -6,7 +6,9 @@
   "scripts": {
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
-    "studio": "prisma studio"
+    "studio": "prisma studio",
+    "lint": "echo 'no lint configured'",
+    "format": "echo 'no format configured'"
   },
   "exports": {
     ".": "./src/index.ts"

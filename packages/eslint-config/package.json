@@ -1,0 +1,24 @@
+{
+  "name": "@brainly/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "module": "index.ts",
+  "exports": {
+    "./base": "./base.ts"
+  },
+  "scripts": {
+    "lint": "echo 'no lint configured'",
+    "format": "echo 'no format configured'"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@eslint/js": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "eslint-plugin-turbo": "^2.0.0",
+    "typescript-eslint": "^8.0.0"
+  }
+}
