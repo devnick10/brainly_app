@@ -1,9 +1,28 @@
-import type { ReactElement } from "react";
-import { Navigate } from "react-router-dom";
+import { getUser } from '@/api/getUser';
+import { useQuery } from '@tanstack/react-query';
+import type { ReactElement } from 'react';
+import { Navigate } from 'react-router-dom';
+import { DashboardSkeleton } from './skeltons/DashboardSkelton';
 
-export function PrivateRoute({ children }: { children: ReactElement }) {
-    const isAuthenticated = localStorage.getItem('token')
-    return isAuthenticated ? children : <Navigate to="/signin" />
+export default function PrivateRoute({ children }: { children: ReactElement }) {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    <Navigate to="/signin" />;
+    return;
+  }
+
+  const { isLoading, data } = useQuery({
+    queryFn: getUser,
+    queryKey: ['user'],
+  });
+
+  if (isLoading) {
+    return <DashboardSkeleton />;
+  }
+
+  if (!data?.user) {
+    <Navigate to="/signin" />;
+  }
+
+  return children;
 }
-
-

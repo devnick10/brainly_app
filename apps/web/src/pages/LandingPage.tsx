@@ -1,8 +1,8 @@
-import { Brain, ArrowRight, Youtube, Twitter, Share2, Zap } from "lucide-react"
-import { Link } from "react-router-dom"
-import { features, steps } from "../lib/constants"
-import { Button } from "../components/ui/button"
-import { Card, CardContent } from "../components/ui/card"
+import { Brain, ArrowRight, Youtube, Twitter, Share2, Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { features, steps } from '../lib/constants';
+import { Button } from '../components/ui/button';
+import { Card, CardContent } from '../components/ui/card';
 
 export default function BrainlyLanding() {
   return (
@@ -37,7 +37,8 @@ export default function BrainlyLanding() {
             <span className="block text-primary">Your Favorite Content</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-            Brainly is your personal vault for YouTube and Twitter content. Save links, organize them, and share collections with anyone.
+            Brainly is your personal vault for YouTube and Twitter content. Save
+            links, organize them, and share collections with anyone.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button size="lg" asChild>
@@ -70,12 +71,13 @@ export default function BrainlyLanding() {
                 Powerful Features
               </h2>
               <p className="mt-4 text-muted-foreground">
-                Everything you need to save, organize, and share your favorite content.
+                Everything you need to save, organize, and share your favorite
+                content.
               </p>
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {features.map((feature) => {
-                const Icon = feature.icon
+                const Icon = feature.icon;
                 return (
                   <Card key={feature.title}>
                     <CardContent className="p-6">
@@ -83,10 +85,12 @@ export default function BrainlyLanding() {
                         <Icon className="h-5 w-5" />
                       </div>
                       <h3 className="mb-2 font-semibold">{feature.title}</h3>
-                      <p className="text-sm text-muted-foreground">{feature.description}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {feature.description}
+                      </p>
                     </CardContent>
                   </Card>
-                )
+                );
               })}
             </div>
           </div>
@@ -109,7 +113,9 @@ export default function BrainlyLanding() {
                     {step.step}
                   </div>
                   <h3 className="mb-2 font-semibold">{step.title}</h3>
-                  <p className="text-sm text-muted-foreground">{step.description}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {step.description}
+                  </p>
                 </div>
               ))}
             </div>
@@ -145,7 +151,8 @@ export default function BrainlyLanding() {
                 <span className="text-lg font-bold">Brainly</span>
               </div>
               <p className="max-w-md text-sm text-muted-foreground">
-                Your personal content vault for saving and sharing YouTube and Twitter links.
+                Your personal content vault for saving and sharing YouTube and
+                Twitter links.
               </p>
             </div>
             <div>
@@ -171,5 +178,5 @@ export default function BrainlyLanding() {
         </div>
       </footer>
     </div>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   ExternalLink,
   Trash2,
@@ -7,54 +7,56 @@ import {
   FileText,
   File,
   Play,
-} from "lucide-react"
-import { toast } from "sonner"
-import { deleteContent } from "../api/deleteContent"
-import { Button } from "./ui/button"
+} from 'lucide-react';
+import { toast } from 'sonner';
+import { deleteContent } from '../api/deleteContent';
+import { Button } from './ui/button';
 import {
   Card as UICard,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "./ui/card"
-import type { Content } from "@/lib/types"
-import { getYoutubeThumbnail } from "@/lib/getYoutubeThumbnail"
-import { Badge } from "@/components/ui/badge"
-interface ContentCardProps extends Content { }
+} from './ui/card';
+import type { Content } from '@/lib/types';
+import { getYoutubeThumbnail } from '@/lib/getYoutubeThumbnail';
+import { Badge } from '@/components/ui/badge';
+interface ContentCardProps extends Content {}
 
-export const ContentCard: React.FC<ContentCardProps> = (props: ContentCardProps) => {
-  const queryClient = useQueryClient()
+export const ContentCard: React.FC<ContentCardProps> = (
+  props: ContentCardProps,
+) => {
+  const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
     mutationFn: deleteContent,
     onSuccess: () => {
-      toast.success("Content deleted")
-      queryClient.invalidateQueries({ queryKey: ["content"] })
+      toast.success('Content deleted');
+      queryClient.invalidateQueries({ queryKey: ['content'] });
     },
     onError: () => {
-      toast.error("Failed to delete content")
+      toast.error('Failed to delete content');
     },
-  })
+  });
 
   return (
     <UICard className="w-80 overflow-hidden">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {props.type === "TWITTER" && (
+            {props.type === 'TWITTER' && (
               <Twitter className="h-4 w-4 text-sky-500" />
             )}
 
-            {props.type === "YOUTUBE" && (
+            {props.type === 'YOUTUBE' && (
               <Youtube className="h-4 w-4 text-red-500" />
             )}
 
-            {props.type === "ARTICLE" && (
+            {props.type === 'ARTICLE' && (
               <FileText className="h-4 w-4 text-blue-500" />
             )}
 
-            {props.type === "DOCUMENT" && (
+            {props.type === 'DOCUMENT' && (
               <File className="h-4 w-4 text-green-500" />
             )}
 
@@ -84,7 +86,7 @@ export const ContentCard: React.FC<ContentCardProps> = (props: ContentCardProps)
       </CardHeader>
 
       <CardContent className="pb-3">
-        {props.type === "YOUTUBE" && (
+        {props.type === 'YOUTUBE' && (
           <div>
             <a
               href={props.link}
@@ -94,7 +96,7 @@ export const ContentCard: React.FC<ContentCardProps> = (props: ContentCardProps)
             >
               <div className="relative">
                 <img
-                  src={getYoutubeThumbnail(props.link) ?? ""}
+                  src={getYoutubeThumbnail(props.link) ?? ''}
                   alt={props.title}
                   className="w-full aspect-video object-cover rounded-md"
                   loading="lazy"
@@ -108,9 +110,9 @@ export const ContentCard: React.FC<ContentCardProps> = (props: ContentCardProps)
           </div>
         )}
 
-        {props.type === "TWITTER" && (
+        {props.type === 'TWITTER' && (
           <div className="bg-muted rounded-md p-4 text-sm text-muted-foreground">
-            {props.imageUrl &&
+            {props.imageUrl && (
               <div className="relative">
                 <img
                   src={props.imageUrl}
@@ -119,13 +121,13 @@ export const ContentCard: React.FC<ContentCardProps> = (props: ContentCardProps)
                   loading="lazy"
                 />
               </div>
-            }
+            )}
           </div>
         )}
 
-        {props.type === "ARTICLE" && (
+        {props.type === 'ARTICLE' && (
           <div className="bg-muted rounded-md p-4 text-sm text-muted-foreground">
-            {props.imageUrl &&
+            {props.imageUrl && (
               <div className="relative">
                 <img
                   src={props.imageUrl}
@@ -134,11 +136,11 @@ export const ContentCard: React.FC<ContentCardProps> = (props: ContentCardProps)
                   loading="lazy"
                 />
               </div>
-            }
+            )}
           </div>
         )}
 
-        {props.type === "DOCUMENT" && (
+        {props.type === 'DOCUMENT' && (
           <div className="bg-muted rounded-md p-4 text-sm text-muted-foreground">
             <p>Document content cannot be previewed.</p>
           </div>
@@ -154,8 +156,8 @@ export const ContentCard: React.FC<ContentCardProps> = (props: ContentCardProps)
         >
           {props.link}
         </a>
-      <Badge className="rounded-sm"> {props.type}</Badge>
+        <Badge className="rounded-sm"> {props.type}</Badge>
       </CardFooter>
     </UICard>
-  )
-}
+  );
+};

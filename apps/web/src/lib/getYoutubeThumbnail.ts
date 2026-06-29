@@ -1,11 +1,9 @@
 export const getYoutubeThumbnail = (url: string) => {
-  const match = url.match(
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/
-  )
+  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
 
-  if (!match) return null
+  if (!match) return null;
 
-  const videoId = match[1]
+  const videoId = match[1];
 
-  return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
-}
+  return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+};

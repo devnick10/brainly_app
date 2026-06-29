@@ -1,10 +1,10 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { useState } from "react"
-import { toast } from "sonner"
-import { addContent } from "../api/addcontent"
-import { Button } from "./ui/button"
-import { Input } from "./ui/input"
-import { Label } from "./ui/label"
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { addContent } from '../api/addcontent';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 import {
   Dialog,
   DialogContent,
@@ -12,49 +12,49 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "./ui/dialog"
+} from './ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select"
-import type { ContentType } from "@/lib/types"
+} from './ui/select';
+import type { ContentType } from '@/lib/types';
 
 interface CreateContentModelProps {
-  open: boolean
-  onClose: () => void
+  open: boolean;
+  onClose: () => void;
 }
 
 export function CreateContentModel({ open, onClose }: CreateContentModelProps) {
-  const queryClient = useQueryClient()
-  const [title, setTitle] = useState("")
-  const [link, setLink] = useState("")
-  const [type, setType] = useState<ContentType>("YOUTUBE")
+  const queryClient = useQueryClient();
+  const [title, setTitle] = useState('');
+  const [link, setLink] = useState('');
+  const [type, setType] = useState<ContentType>('YOUTUBE');
 
   const { mutate, isPending } = useMutation({
     mutationFn: addContent,
     onSuccess: () => {
-      toast.success("Content added successfully")
-      queryClient.invalidateQueries({ queryKey: ['content'] })
-      setTitle("")
-      setLink("")
-      setType("YOUTUBE")
-      onClose()
+      toast.success('Content added successfully');
+      queryClient.invalidateQueries({ queryKey: ['content'] });
+      setTitle('');
+      setLink('');
+      setType('YOUTUBE');
+      onClose();
     },
     onError: () => {
-      toast.error("Failed to add content")
-    }
-  })
+      toast.error('Failed to add content');
+    },
+  });
 
   const handleSubmit = () => {
     if (!title || !link || !type) {
-      toast.error("Please fill in all fields")
-      return
+      toast.error('Please fill in all fields');
+      return;
     }
-    mutate({ title, link, type })
-  }
+    mutate({ title, link, type });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -86,7 +86,10 @@ export function CreateContentModel({ open, onClose }: CreateContentModelProps) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="type">Content Type</Label>
-            <Select value={type} onValueChange={(value) => setType(value as ContentType)}>
+            <Select
+              value={type}
+              onValueChange={(value) => setType(value as ContentType)}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select content type" />
               </SelectTrigger>
@@ -104,10 +107,10 @@ export function CreateContentModel({ open, onClose }: CreateContentModelProps) {
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={isPending}>
-            {isPending ? "Adding..." : "Add Content"}
+            {isPending ? 'Adding...' : 'Add Content'}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

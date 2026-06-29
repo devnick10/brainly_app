@@ -1,10 +1,10 @@
-export type ContentType = "YOUTUBE" | "TWITTER" | "ARTICLE" | "DOCUMENT"
+export type ContentType = 'YOUTUBE' | 'TWITTER' | 'ARTICLE' | 'DOCUMENT';
 
 export interface ContentPayload {
   title: string;
-  description?: string
+  description?: string;
   type: ContentType;
-  link: string
+  link: string;
 }
 
 export interface UserData {
@@ -22,14 +22,13 @@ export interface Content {
   id: string;
   link: string;
   title: string;
-  description?: string
+  description?: string;
   type: ContentType;
-  searchableText: string
-  imageUrl?: string
-  siteName?: string
-  author?: string
+  searchableText: string;
+  imageUrl?: string;
+  siteName?: string;
+  author?: string;
   tags: { id: string; title: string }[];
   userId: string;
   user?: { email: string };
 }
-
