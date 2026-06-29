@@ -33,6 +33,7 @@ userRouter.post('/signup', zValidator('json', signupSchema), async (c) => {
       token,
     });
   } catch (error) {
+    console.error(error);
     throw new HTTPException(500, { message: 'Internal server error' });
   }
 });
@@ -60,6 +61,7 @@ userRouter.post('/signin', zValidator('json', signinSchema), async (c) => {
       token,
     });
   } catch (error) {
+    console.error(error);
     throw new HTTPException(500, { message: 'Internal server error' });
   }
 });
@@ -84,6 +86,7 @@ userRouter.get('/me', authMiddleware, async (c) => {
       user,
     });
   } catch (error) {
+    console.error(error);
     throw new HTTPException(500, { message: 'Internal server error' });
   }
 });

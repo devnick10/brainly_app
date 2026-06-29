@@ -10,6 +10,7 @@ export const zValidator = <
   target: Target,
   schema: T,
 ) =>
+  // eslint-disable-next-line
   zv(target, schema, (result, c) => {
     if (!result.success) {
       throw new HTTPException(400, { message: result.error.toString() });

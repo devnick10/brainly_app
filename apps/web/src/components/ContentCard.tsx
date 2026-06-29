@@ -21,7 +21,8 @@ import {
 import type { Content } from '@/lib/types';
 import { getYoutubeThumbnail } from '@/lib/getYoutubeThumbnail';
 import { Badge } from '@/components/ui/badge';
-interface ContentCardProps extends Content {}
+
+type ContentCardProps = Content;
 
 export const ContentCard: React.FC<ContentCardProps> = (
   props: ContentCardProps,

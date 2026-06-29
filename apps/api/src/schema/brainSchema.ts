@@ -1,4 +1,4 @@
-import z, { string } from 'zod';
+import z from 'zod';
 export const ContentType = {
   YOUTUBE: 'YOUTUBE',
   TWITTER: 'TWITTER',

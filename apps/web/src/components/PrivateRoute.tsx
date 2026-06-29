@@ -6,15 +6,15 @@ import { DashboardSkeleton } from './skeltons/DashboardSkelton';
 
 export default function PrivateRoute({ children }: { children: ReactElement }) {
   const token = localStorage.getItem('token');
-  if (!token) {
-    <Navigate to="/signin" />;
-    return;
-  }
-
   const { isLoading, data } = useQuery({
     queryFn: getUser,
     queryKey: ['user'],
   });
+
+  if (!token) {
+    <Navigate to="/signin" />;
+    return;
+  }
 
   if (isLoading) {
     return <DashboardSkeleton />;
