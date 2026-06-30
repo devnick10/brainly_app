@@ -15,6 +15,12 @@ enum ContentType {
   DOCUMENT
 }
 
+enum ContentStatus {
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
 model User {
   id       String @id @default(cuid())
   email    String @unique
@@ -46,9 +52,9 @@ model Content {
   publishedAt DateTime?
 
   userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  tags Tag[]
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status ContentStatus @default(PROCESSING)
+  tags   Tag[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

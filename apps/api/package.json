@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@brainly/db": "*",
+    "@brainly/ai": "*",
     "@hono/zod-validator": "^0.8.0",
     "cheerio": "^1.2.0",
     "dotenv": "^17.4.2",

@@ -1,52 +1,43 @@
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import { publisher } from '../lib/publisher';
 import { authMiddleware } from '../middlewares/auth';
 import { zValidator } from '../middlewares/validator';
 import { CreateContentSchema } from '../schema/brainSchema';
-import { AppContext } from '../types';
-import { getMetadata } from '../metadata';
-import { generateEmbedding } from '../lib/embeddings';
+import { AppContext, SearchResult } from '../types';
+import { generateEmbedding } from '@brainly/ai';
 
 const brainRouter = new Hono<AppContext>();
 
 brainRouter.get('/search', authMiddleware, async (c) => {
+  const prisma = c.get('prisma');
+  const userId = c.get('userId');
+
+  const query = c.req.query('q')?.trim();
+  if (!query || query.length < 2) {
+    return c.json({ content: [] });
+  }
+
   try {
-    const userId = c.get('userId');
-    const query = c.req.query('q');
-    if (!query) {
-      return c.json({ content: [] });
-    }
-
-    const prisma = c.get('prisma');
-
-    const aiResponse = await c.env.AI.run('@cf/baai/bge-base-en-v1.5', {
-      text: [query],
-    });
-    const embedding = (aiResponse as { data: number[][] }).data[0];
+    const embedding = await generateEmbedding(query, c.env.AI);
     const embeddingStr = `[${embedding.join(',')}]`;
 
-    const results = await prisma.$queryRawUnsafe<
-      Array<{
-        id: string;
-        title: string;
-        description: string | null;
-        link: string;
-        type: string;
-        searchableText: string | null;
-        userId: string;
-        createdAt: Date;
-        distance: number;
-      }>
-    >(
-      `SELECT id, title, description, link, type, "searchableText", "userId", "createdAt",
-               embedding <-> $1::vector AS distance
-        FROM "Content"
-        WHERE "userId" = $2
-        ORDER BY distance
-        LIMIT 10`,
-      embeddingStr,
-      userId,
-    );
+    const results = await prisma.$queryRaw<SearchResult>`SELECT
+      id,
+      title,
+      description,
+      link,
+      type,
+      "searchableText",
+      "userId",
+      "createdAt",
+      embedding < -> ${embeddingStr}::vector < 0.7
+      FROM "Content"
+      WHERE "userId" = ${userId}
+      AND status = 'COMPLETED'
+      ORDER BY distance
+      LIMIT 10;
+    `;
 
     return c.json({ content: results });
   } catch (error) {
@@ -86,36 +77,28 @@ brainRouter.post(
     const prisma = c.get('prisma');
 
     try {
-      const metadata = await getMetadata(link);
-      const searchableText = metadata.searchableText;
-      const embedding = await generateEmbedding(searchableText, c.env.AI);
-
       // Create the content entry in the database
-      await prisma.$transaction(async (tx) => {
-        const newContent = await tx.content.create({
-          data: {
-            link,
-            title,
-            description,
-            type,
-            searchableText,
-            imageUrl: metadata.imageUrl || null,
-            siteName: metadata.siteName || null,
-            author: metadata.author || null,
-            userId,
-            ...(tags?.length && {
-              tags: {
-                connectOrCreate: tags.map((tag) => ({
-                  where: { title: tag },
-                  create: { title: tag },
-                })),
-              },
-            }),
-          },
-        });
-        // Store the embedding in the database using raw SQL
-        await tx.$executeRaw`UPDATE "Content" SET ${embedding}::vector WHERE id = ${newContent.id}`;
+      const newContent = await prisma.content.create({
+        data: {
+          link,
+          title,
+          description,
+          type,
+          userId,
+          ...(tags?.length && {
+            tags: {
+              connectOrCreate: tags.map((tag) => ({
+                where: { title: tag },
+                create: { title: tag },
+              })),
+            },
+          }),
+        },
       });
+      // Store the embedding in the database using raw SQL
+      // await tx.$executeRaw`UPDATE "Content" SET ${ embedding }::vector WHERE id = ${ newContent.id } `;
+      // Pushlish to queue
+      await publisher(c.env.CONTENT_QUEUE, { contentId: newContent.id });
 
       return c.json({
         message: 'Content created successfully',

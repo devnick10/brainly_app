@@ -5,6 +5,7 @@ export type Bindings = {
   DATABASE_URL: string;
   JWT_SECRET: string;
   AI: Ai;
+  CONTENT_QUEUE: Queue;
 };
 
 export type AppContext = {
@@ -14,3 +15,19 @@ export type AppContext = {
     userId: string;
   };
 };
+
+export interface ContentProcessingJob {
+  contentId: string;
+}
+
+export type SearchResult = {
+  id: string;
+  title: string;
+  description: string | null;
+  link: string;
+  type: string;
+  searchableText: string | null;
+  userId: string;
+  createdAt: Date;
+  distance: number;
+}[];

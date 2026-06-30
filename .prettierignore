@@ -2,3 +2,9 @@
 dist
 node_modules
 build
+*.prisma
+*.sql
+*.lock
+*.env.example
+.gitignore
+.prettierignore

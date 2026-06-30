@@ -1,0 +1,15 @@
+{
+  "name": "@brainly/ai",
+  "module": "ai.ts",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./ai.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
