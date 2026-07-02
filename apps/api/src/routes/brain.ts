@@ -15,31 +15,34 @@ brainRouter.get('/search', authMiddleware, async (c) => {
 
   const query = c.req.query('q')?.trim();
   if (!query || query.length < 2) {
-    return c.json({ content: [] });
+    return c.json({ success: true, content: [] });
   }
 
   try {
     const embedding = await generateEmbedding(query, c.env.AI);
     const embeddingStr = `[${embedding.join(',')}]`;
 
-    const results = await prisma.$queryRaw<SearchResult>`SELECT
-      id,
-      title,
-      description,
-      link,
-      type,
-      "searchableText",
-      "userId",
-      "createdAt",
-      embedding < -> ${embeddingStr}::vector < 0.7
+    const results = await prisma.$queryRaw<SearchResult>`
+      SELECT
+        id,
+        title,
+        description,
+        link,
+        type,
+        "searchableText",
+        "imageUrl",
+        "userId",
+        "createdAt",
+        embedding <-> ${embeddingStr}::vector AS distance
       FROM "Content"
       WHERE "userId" = ${userId}
-      AND status = 'COMPLETED'
+        AND status = 'COMPLETED'
+        AND embedding <-> ${embeddingStr}::vector < 0.7
       ORDER BY distance
       LIMIT 10;
     `;
 
-    return c.json({ content: results });
+    return c.json({ success: true, content: results });
   } catch (error) {
     console.error(error);
     throw new HTTPException(500, { message: 'Failed to search content.' });

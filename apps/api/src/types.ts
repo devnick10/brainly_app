@@ -27,6 +27,7 @@ export type SearchResult = {
   link: string;
   type: string;
   searchableText: string | null;
+  imageUrl: string | null;
   userId: string;
   createdAt: Date;
   distance: number;

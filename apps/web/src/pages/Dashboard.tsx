@@ -1,47 +1,47 @@
 import { DashbaordHeader } from '@/components/DashbaordHeader';
 import { CardsSkeletonLoader } from '@/components/skeltons/CardsSkelton';
 import { useQuery } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { getContent } from '../api/getContent';
+import { searchContent } from '../api/searchContent';
 import { ContentCard } from '../components/ContentCard';
 import { CreateContentModel } from '../components/CreateContentModel';
 import { SideBar } from '../components/SideBar';
 import { Button } from '../components/ui/button';
-import type { Content, ContentType } from '../lib/types';
+import type { ContentType } from '../lib/types';
 
 export default function Dashboard() {
   const [modelOpen, setModelOpen] = useState(false);
-  const [contentData, setContentData] = useState<Content[]>([]);
   const [activeFilter, setActiveFilter] = useState<'all' | ContentType>('all');
   const [searchQuery, setSearchQuery] = useState('');
-
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['content'],
-    queryFn: getContent,
-  });
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
   useEffect(() => {
-    if (data) {
-      setContentData(data?.content || []);
-    }
-  }, [data]);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const isSearching = debouncedSearch.length >= 2;
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: isSearching ? ['search', debouncedSearch] : ['content'],
+    queryFn: isSearching ? () => searchContent(debouncedSearch) : getContent,
+    placeholderData: (prev) => prev,
+  });
 
   const filteredData = useMemo(() => {
-    let items = contentData;
+    const items = data?.content || [];
     if (activeFilter !== 'all') {
-      items = items.filter((item) => item.type === activeFilter);
-    }
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      items = items.filter(
-        (item) =>
-          item.title.toLowerCase().includes(q) ||
-          item.link.toLowerCase().includes(q),
-      );
+      return items.filter((item) => item.type === activeFilter);
     }
     return items;
-  }, [contentData, activeFilter, searchQuery]);
+  }, [data, activeFilter]);
+
+  const showLoading = isLoading && !data;
+  const showEmpty = !showLoading && !error && filteredData.length === 0;
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -66,19 +66,24 @@ export default function Dashboard() {
             open={modelOpen}
             onClose={() => setModelOpen(false)}
           />
-          {isLoading && <CardsSkeletonLoader />}
+          {showLoading && <CardsSkeletonLoader />}
           {error && (
             <div className="flex h-full items-center justify-center">
               <p className="text-destructive">Error loading content</p>
             </div>
           )}
-          {!isLoading && !error && filteredData.length === 0 && (
+          {showEmpty && (
             <div className="flex h-full items-center justify-center">
               <div className="text-center">
+                {isSearching && (
+                  <Search className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+                )}
                 <p className="text-muted-foreground">
-                  {searchQuery ? 'No results found' : 'No content yet'}
+                  {isSearching
+                    ? `No results for "${debouncedSearch}"`
+                    : 'No content yet'}
                 </p>
-                {!searchQuery && (
+                {!isSearching && (
                   <Button
                     variant="outline"
                     className="mt-4"
@@ -91,7 +96,7 @@ export default function Dashboard() {
               </div>
             </div>
           )}
-          {!isLoading && !error && filteredData.length > 0 && (
+          {!showLoading && !error && filteredData.length > 0 && (
             <div className="flex flex-wrap gap-4">
               {filteredData.map((content) => (
                 <ContentCard key={content.id} {...content} />
