@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { signupUser } from '../signupUser';
 
-const mockFetch = vi.fn();
+const mockFetch = vi.fn() as unknown as typeof fetch;
 globalThis.fetch = mockFetch;
 
 beforeEach(() => {
