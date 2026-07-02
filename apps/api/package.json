@@ -6,7 +6,9 @@
     "deploy": "wrangler deploy --minify",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
     "lint": "eslint .",
-    "format": "prettier --check ."
+    "format": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@brainly/db": "*",
@@ -22,6 +24,7 @@
     "@cloudflare/workers-types": "^4.20260624.1",
     "dotenv-cli": "^11.0.0",
     "typescript": "^6.0.3",
+    "vitest": "^4.1.9",
     "wrangler": "^4.4.0"
   }
 }

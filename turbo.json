@@ -11,6 +11,7 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**"]
     },
+    "test": {},
     "db:generate": {
       "dependsOn": ["^db:generate"],
       "outputs": ["src/generated/**"]
