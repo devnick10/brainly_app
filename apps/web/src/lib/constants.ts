@@ -1,40 +1,41 @@
-import { Share2, Shield, Copy, Eye, Plus, Globe } from 'lucide-react';
+import { Search, Link, Tags, Share2, Zap, Shield } from 'lucide-react';
 
 export const features = [
   {
-    icon: Shield,
-    title: 'Secure Authentication',
+    icon: Search,
+    title: 'AI Semantic Search',
     description:
-      'Safe sign up and sign in with JWT-based authentication to protect your content.',
+      'Find content by meaning, not just keywords. Vector embeddings power intelligent retrieval.',
   },
   {
-    icon: Plus,
-    title: 'Easy Content Saving',
+    icon: Link,
+    title: 'Multi-Source Saving',
     description:
-      'Simply paste YouTube or Twitter links with custom titles and organize by type.',
+      'Save content from YouTube, X (Twitter), articles, documents, and more.',
+  },
+  {
+    icon: Tags,
+    title: 'Tag Organization',
+    description:
+      'Organize content with tags and build a structured personal knowledge base.',
   },
   {
     icon: Share2,
-    title: 'Smart Sharing',
-    description: 'Share your entire collection with unique public links.',
+    title: 'Public Collections',
+    description:
+      'Share curated collections with anyone via unique public share links.',
   },
   {
-    icon: Globe,
-    title: 'Public Access',
+    icon: Zap,
+    title: 'Background Processing',
     description:
-      'Generate shareable public pages that anyone can view without logging in.',
+      'Metadata extraction and embeddings generated asynchronously — no waiting.',
   },
   {
-    icon: Copy,
-    title: 'One-Click Copy',
+    icon: Shield,
+    title: 'JWT Authentication',
     description:
-      'Instantly copy shareable links to your clipboard for easy distribution.',
-  },
-  {
-    icon: Eye,
-    title: 'Dashboard View',
-    description:
-      'Clean, organized dashboard to view and manage all your saved content.',
+      'Secure sign up and sign in to keep your personal content vault safe.',
   },
 ];
 
@@ -43,31 +44,24 @@ export const steps = [
     step: '01',
     title: 'Sign Up',
     description:
-      'Create your account to get started with your personal content vault.',
+      'Create your secure account and start building your personal content vault.',
   },
   {
     step: '02',
-    title: 'Add Content',
+    title: 'Save Content',
     description:
-      'Paste YouTube or Twitter links, add titles, and organize by type.',
+      'Paste links from YouTube, X, articles, or any source you want to remember.',
   },
   {
     step: '03',
-    title: 'Organize',
-    description: 'View all your saved content in a clean dashboard.',
+    title: 'AI Enrichment',
+    description:
+      'Metadata and embeddings are generated automatically in the background.',
   },
   {
     step: '04',
-    title: 'Share',
-    description: 'Generate unique public links to share your collection.',
+    title: 'Search & Share',
+    description:
+      'Find anything instantly with semantic search or share collections publicly.',
   },
-];
-
-export const techStack = [
-  { name: 'React', color: 'bg-blue-100 text-blue-800' },
-  { name: 'Vite', color: 'bg-purple-100 text-purple-800' },
-  { name: 'Tailwind CSS', color: 'bg-cyan-100 text-cyan-800' },
-  { name: 'TanStack Query', color: 'bg-orange-100 text-orange-800' },
-  { name: 'Hono', color: 'bg-green-100 text-green-800' },
-  { name: 'PostgreSQL', color: 'bg-emerald-100 text-emerald-800' },
 ];

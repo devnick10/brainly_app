@@ -1,4 +1,11 @@
-import { Brain, ArrowRight, Youtube, Twitter, Share2, Zap } from 'lucide-react';
+import {
+  Brain,
+  ArrowRight,
+  Youtube,
+  Twitter,
+  FileText,
+  Tags,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { features, steps } from '../lib/constants';
 import { Button } from '../components/ui/button';
@@ -28,17 +35,20 @@ export default function BrainlyLanding() {
         <section className="container mx-auto px-4 py-24 text-center">
           <div className="mx-auto mb-6 flex items-center justify-center">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-4 py-1.5 text-sm text-muted-foreground">
-              <Zap className="h-3.5 w-3.5" />
-              Your Personal Content Vault
+              <Brain className="h-3.5 w-3.5" />
+              AI-Powered Content Vault
             </span>
           </div>
           <h1 className="mx-auto max-w-3xl text-4xl font-bold tracking-tight sm:text-6xl">
-            Save, Organize & Share
-            <span className="block text-primary">Your Favorite Content</span>
+            Save, Search & Share
+            <span className="block text-primary">
+              With AI-Powered Precision
+            </span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-            Brainly is your personal vault for YouTube and Twitter content. Save
-            links, organize them, and share collections with anyone.
+            Brainly is an AI content bookmarking platform that saves, organizes,
+            and retrieves content from YouTube, X, articles, and more — using
+            semantic search powered by vector embeddings.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button size="lg" asChild>
@@ -48,18 +58,21 @@ export default function BrainlyLanding() {
               </Link>
             </Button>
           </div>
-          <div className="mt-12 flex items-center justify-center gap-8 text-muted-foreground">
+          <div className="mt-12 flex items-center justify-center gap-6 text-muted-foreground flex-wrap">
             <span className="flex items-center gap-2">
               <Youtube className="h-5 w-5 text-red-500" />
               YouTube
             </span>
             <span className="flex items-center gap-2">
-              <Twitter className="h-5 w-5 text-sky-500" />
-              Twitter
+              <Twitter className="h-5 w-5 text-sky-500" />X (Twitter)
             </span>
             <span className="flex items-center gap-2">
-              <Share2 className="h-5 w-5 text-green-500" />
-              Easy Sharing
+              <FileText className="h-5 w-5 text-amber-500" />
+              Articles
+            </span>
+            <span className="flex items-center gap-2">
+              <Tags className="h-5 w-5 text-violet-500" />
+              Tags
             </span>
           </div>
         </section>
@@ -71,8 +84,8 @@ export default function BrainlyLanding() {
                 Powerful Features
               </h2>
               <p className="mt-4 text-muted-foreground">
-                Everything you need to save, organize, and share your favorite
-                content.
+                Everything you need to build and explore your personal knowledge
+                base.
               </p>
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -103,7 +116,8 @@ export default function BrainlyLanding() {
                 How It Works
               </h2>
               <p className="mt-4 text-muted-foreground">
-                Get started in minutes with our simple process.
+                From saving a link to finding it by meaning — in four simple
+                steps.
               </p>
             </div>
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -128,7 +142,8 @@ export default function BrainlyLanding() {
               Ready to Build Your Brain?
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-primary-foreground/80">
-              Join thousands of users organizing their content with Brainly.
+              Start saving content intelligently with AI-powered organization
+              and retrieval.
             </p>
             <div className="mt-8">
               <Button size="lg" variant="secondary" asChild>
@@ -151,8 +166,8 @@ export default function BrainlyLanding() {
                 <span className="text-lg font-bold">Brainly</span>
               </div>
               <p className="max-w-md text-sm text-muted-foreground">
-                Your personal content vault for saving and sharing YouTube and
-                Twitter links.
+                AI-powered content bookmarking platform using semantic search
+                with vector embeddings. Built on Cloudflare's edge platform.
               </p>
             </div>
             <div>
