@@ -37,7 +37,6 @@ brainRouter.get('/search', authMiddleware, async (c) => {
       FROM "Content"
       WHERE "userId" = ${userId}
         AND status = 'COMPLETED'
-        AND embedding <-> ${embeddingStr}::vector < 0.7
       ORDER BY distance
       LIMIT 10;
     `;
