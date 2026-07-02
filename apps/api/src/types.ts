@@ -4,6 +4,7 @@ export type Bindings = {
   ACCESS_ORIGIN: string;
   DATABASE_URL: string;
   JWT_SECRET: string;
+  GOOGLE_CLIENT_ID: string;
   AI: Ai;
   CONTENT_QUEUE: Queue;
 };

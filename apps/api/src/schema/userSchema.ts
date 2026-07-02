@@ -7,7 +7,12 @@ const signinSchema = z.object({
 
 const signupSchema = signinSchema;
 
+const googleSchema = z.object({
+  credential: z.string().min(1),
+});
+
 export type Signin = z.infer<typeof signinSchema>;
 export type Signup = z.infer<typeof signupSchema>;
+export type GoogleAuth = z.infer<typeof googleSchema>;
 
-export { signupSchema, signinSchema };
+export { signupSchema, signinSchema, googleSchema };

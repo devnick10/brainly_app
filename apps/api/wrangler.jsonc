@@ -47,6 +47,7 @@
       "DATABASE_URL",
       "ACCESS_ORIGIN",
       "DEV_ACCESS_ORIGIN",
+      "GOOGLE_CLIENT_ID",
     ],
   },
 }
