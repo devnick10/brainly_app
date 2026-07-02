@@ -34,6 +34,10 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
+beforeAll(() => {
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+});
+
 describe('GET /api/v1/brain', () => {
   it('returns content list', async () => {
     const app = createTestApp();

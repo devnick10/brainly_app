@@ -32,6 +32,10 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
+beforeAll(() => {
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+});
+
 describe('POST /api/v1/user/signup', () => {
   it('creates a user and returns a token', async () => {
     const app = createTestApp();
