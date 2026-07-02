@@ -1,22 +1,31 @@
-# Brainly App
+# Brainly
 
-Brainly is an AI-powered content bookmarking platform that helps users save, organize, search, and share content from YouTube, X (Twitter), articles, and other sources. Instead of relying only on exact keywords, Brainly uses vector embeddings and semantic search to retrieve content based on meaning and context.
+Brainly is an AI-powered content bookmarking platform that helps users save, organize, search, and share content from YouTube, X (Twitter), articles, and other sources.
 
-## Features
+Unlike traditional bookmarking applications, Brainly uses semantic search powered by vector embeddings, allowing users to retrieve content based on meaning rather than exact keywords.
 
-- Secure user authentication using JWT
+The application is built on Cloudflare's edge platform using an event-driven architecture. Content enrichment (metadata extraction and embedding generation) is performed asynchronously through Cloudflare Queues, keeping API responses fast and scalable.
+
+---
+
+# Features
+
+- JWT Authentication
 - Save content from YouTube, X (Twitter), articles, and documents
-- Organize content with tags and categories
 - AI-powered semantic search using vector embeddings
-- Find saved content using natural language queries
-- Public sharing of your entire content collection
-- Unique shareable links for collaboration and discovery
-- Responsive dashboard for managing saved content
-- Fast vector similarity search powered by pgvector
+- Automatic metadata extraction
+- Tag-based organization
+- Public shareable collections
+- Background content processing
+- Retry failed processing jobs
+- Fast vector similarity search with pgvector
+- Event-driven architecture using Cloudflare Queues
 
-## Tech Stack
+---
 
-### Frontend
+# Tech Stack
+
+## Frontend
 
 - Next.js
 - TypeScript
@@ -25,183 +34,369 @@ Brainly is an AI-powered content bookmarking platform that helps users save, org
 - shadcn/ui
 - Lucide React
 
-### Backend
+## Backend
 
 - Hono
 - Cloudflare Workers
+- Cloudflare Queues
 - Cloudflare Workers AI
 - Prisma ORM
+- Prisma Accelerate
 - PostgreSQL (Neon)
 - pgvector
 - Zod
 - jose (JWT Authentication)
 
-## Architecture
+## Infrastructure
+
+- Turborepo
+- Bun
+- Wrangler
+
+---
+
+# Architecture
 
 ```text
-Frontend (Next.js)
-        │
-        ▼
-Cloudflare Workers (Hono API)
-        │
-        ▼
-Cloudflare Workers AI
-(Embedding Generation)
-        │
-        ▼
-PostgreSQL + pgvector
-(Vector Storage & Similarity Search)
+                           ┌────────────────────┐
+                           │      Client        │
+                           └─────────┬──────────┘
+                                     │
+                                     ▼
+                        ┌────────────────────────┐
+                        │ API Worker (Hono)      │
+                        │                        │
+                        │ • Authentication       │
+                        │ • CRUD                 │
+                        │ • Semantic Search      │
+                        │ • Queue Publisher      │
+                        └─────────┬──────────────┘
+                                  │
+                                  │ Queue.send(contentId)
+                                  ▼
+                      ┌──────────────────────────┐
+                      │  Cloudflare Queue        │
+                      └──────────┬───────────────┘
+                                 │
+                                 ▼
+                    ┌────────────────────────────┐
+                    │ Processor Worker (Hono)    │
+                    │                            │
+                    │ • Consume Queue            │
+                    │ • Fetch Metadata           │
+                    │ • Generate Embeddings      │
+                    │ • Update Database          │
+                    │ • Retry Failed Jobs        │
+                    └──────────┬─────────────────┘
+                               │
+              ┌────────────────┴──────────────┐
+              ▼                               ▼
+      Cloudflare Workers AI          Metadata Providers
+             │                     (OpenGraph, YouTube)
+             └──────────────┬──────────────────────────┘
+                            ▼
+                   PostgreSQL + pgvector
 ```
 
-## How Semantic Search Works
+---
 
-### Saving Content
-
-1. User saves a link with title and description.
-2. A searchable text representation is generated.
-3. Cloudflare Workers AI generates a vector embedding.
-4. The embedding is stored in PostgreSQL using pgvector.
+# Repository Structure
 
 ```text
-Save Content
-      ↓
+brainly_app/
+│
+├── apps/
+│   ├── api/
+│   ├── processor/
+│   └── web/
+│
+├── packages/
+│   ├── ai/
+│   └── db/
+│
+├── turbo.json
+└── package.json
+```
+
+---
+
+# Content Processing Pipeline
+
+## Creating Content
+
+When a user saves content, the API immediately stores the basic information and publishes a background job.
+
+```text
+Client
+    │
+    ▼
+POST /brain
+    │
+    ▼
+Insert Content
+status = PROCESSING
+    │
+    ▼
+Publish Queue Message
+(contentId)
+    │
+    ▼
+201 Created
+```
+
+---
+
+## Background Processing
+
+The Processor Worker consumes queue messages and enriches the content asynchronously.
+
+```text
+Cloudflare Queue
+        │
+        ▼
+Processor Worker
+        │
+        ▼
+Load Content
+        │
+        ▼
+Fetch Metadata
+        │
+        ▼
 Generate Embedding
-      ↓
-Store Vector
-      ↓
-Persist Metadata
+        │
+        ▼
+Update Database
+        │
+        ▼
+status = COMPLETED
 ```
 
-### Searching Content
+---
 
-1. User enters a search query.
-2. Query embedding is generated.
-3. pgvector performs similarity search.
-4. Most relevant content is returned.
+## Semantic Search
+
+Search queries are converted into vector embeddings and compared against stored content using pgvector similarity search.
 
 ```text
 Search Query
-      ↓
+      │
+      ▼
 Generate Query Embedding
-      ↓
+      │
+      ▼
 Vector Similarity Search
-      ↓
+      │
+      ▼
 Rank Results
-      ↓
+      │
+      ▼
 Return Relevant Content
 ```
 
-## Database Features
+---
 
-- PostgreSQL relational data modeling
+# Retry Flow
+
+If background processing fails, the content is marked as `FAILED`.
+
+An administrator or automated system can trigger a retry.
+
+```text
+FAILED
+   │
+POST /retry/:contentId
+   │
+   ▼
+status = PROCESSING
+   │
+   ▼
+Queue.send(contentId)
+   │
+   ▼
+Processor Worker
+```
+
+---
+
+# Content Lifecycle
+
+```text
+PROCESSING
+      │
+      ▼
+Metadata + Embedding Generated
+      │
+      ▼
+COMPLETED
+      │
+      └────────────► FAILED
+                          │
+                          ▼
+                    Retry Processing
+```
+
+---
+
+# Why Asynchronous Processing?
+
+Metadata extraction and AI embedding generation involve external services and can significantly increase request latency.
+
+Instead of performing these operations during the API request, Brainly publishes a message to Cloudflare Queues and immediately responds to the client.
+
+A dedicated Processor Worker enriches the content in the background, improving:
+
+- Lower API latency
+- Better scalability
+- Fault tolerance
+- Automatic retries
+- Separation of concerns
+
+---
+
+# Database Features
+
+- PostgreSQL relational data model
 - Prisma ORM with type-safe queries
 - pgvector for vector storage
 - Vector similarity search
-- Relational content, user, tag, and sharing models
+- Many-to-many content tagging
+- Shareable public collections
 
-## Getting Started
+---
 
-### Prerequisites
+# Getting Started
+
+## Prerequisites
 
 - Bun
 - Node.js 20+
 - Wrangler CLI
-- Neon PostgreSQL Database
-- Cloudflare Account with Workers AI enabled
+- Neon PostgreSQL
+- Cloudflare Account
+- Workers AI Enabled
 
-### Installation
+---
+
+## Installation
 
 ```bash
 git clone https://github.com/devnick10/brainly_app.git
 
 cd brainly_app
 
-# Frontend
-cd frontend
-bun install
-
-# Backend
-cd ../backend
 bun install
 ```
 
-### Environment Variables
+---
 
-Frontend:
+## Environment Variables
 
-```env
-VITE_BASE_URL=http://localhost:8787/api/v1
-```
-
-Backend:
+### API Worker
 
 ```env
 DATABASE_URL=
-DIRECT_DATABASE_URL=
 JWT_SECRET=
 ACCESS_ORIGIN=
 ```
 
-### Development
+### Processor Worker
 
-Backend:
+```env
+DATABASE_URL=
+```
+
+### Frontend
+
+```env
+NEXT_PUBLIC_API_URL=
+```
+
+---
+
+## Development
+
+Run all applications:
 
 ```bash
-cd backend
 bun run dev
 ```
 
-Frontend:
+Or run individual apps:
 
 ```bash
-cd frontend
-bun run dev
+bun turbo dev --filter=api
+bun turbo dev --filter=processor
+bun turbo dev --filter=web
 ```
 
-### Database
+---
 
-Generate Prisma Client:
+## Database
+
+Generate Prisma Client
 
 ```bash
-bun run generate
+bunx prisma generate
 ```
 
-Apply Schema Changes:
+Push Schema
 
 ```bash
 bunx prisma db push
 ```
 
-## API Routes
+---
 
-| Method | Endpoint                   | Description                         |
-| ------ | -------------------------- | ----------------------------------- |
-| POST   | `/api/v1/user/signup`      | Create account                      |
-| POST   | `/api/v1/user/signin`      | Login user                          |
-| GET    | `/api/v1/brain`            | Fetch saved content                 |
-| POST   | `/api/v1/brain`            | Save content and generate embedding |
-| DELETE | `/api/v1/brain/:contentId` | Delete content                      |
-| GET    | `/api/v1/brain/search?q=`  | Semantic search                     |
-| POST   | `/api/v1/brain/share`      | Create or remove share link         |
-| GET    | `/api/v1/brain/:sharelink` | Access public shared collection     |
+# API Routes
 
-## Future Improvements
+| Method | Endpoint                   | Description                        |
+| ------ | -------------------------- | ---------------------------------- |
+| POST   | `/api/v1/user/signup`      | Create account                     |
+| POST   | `/api/v1/user/signin`      | User login                         |
+| GET    | `/api/v1/brain`            | List saved content                 |
+| POST   | `/api/v1/brain`            | Save new content                   |
+| DELETE | `/api/v1/brain/:contentId` | Delete content                     |
+| GET    | `/api/v1/brain/search?q=`  | Semantic search                    |
+| POST   | `/api/v1/brain/share`      | Create or remove public share link |
+| GET    | `/api/v1/brain/:shareLink` | View shared collection             |
+
+### Processor
+
+| Method | Endpoint                | Description             |
+| ------ | ----------------------- | ----------------------- |
+| POST   | `/api/retry/:contentId` | Retry failed processing |
+| GET    | `/api/health`           | Health check            |
+
+---
+
+# Future Improvements
 
 - Hybrid Search (Semantic + Full Text Search)
+- Dead Letter Queue
 - Content recommendations
 - AI-generated summaries
-- Multi-modal search
 - Personalized ranking
-- Content clustering
+- Batch embedding generation
+- Observability & metrics
+- Content deduplication
 
-## Key Learnings
+---
 
-- Cloudflare Workers & Edge Computing
-- AI Embeddings and Semantic Search
-- PostgreSQL Vector Databases
-- Vector Similarity Search with pgvector
-- Retrieval-Augmented Search Patterns
+# Key Learnings
 
-## Author
+- Event-driven architecture
+- Cloudflare Workers
+- Cloudflare Queues
+- Workers AI
+- Edge computing
+- Semantic search
+- PostgreSQL + pgvector
+- Background job processing
+- Monorepo architecture with Turborepo
+
+---
+
+# Author
 
 GitHub: https://github.com/devnick10

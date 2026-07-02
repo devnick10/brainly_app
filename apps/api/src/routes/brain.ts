@@ -95,8 +95,6 @@ brainRouter.post(
           }),
         },
       });
-      // Store the embedding in the database using raw SQL
-      // await tx.$executeRaw`UPDATE "Content" SET ${ embedding }::vector WHERE id = ${ newContent.id } `;
       // Pushlish to queue
       await publisher(c.env.CONTENT_QUEUE, { contentId: newContent.id });
 

@@ -1,11 +1,24 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "processor",
+  "name": "brainly-processor",
   "main": "src/index.ts",
-  "compatibility_date": "2026-06-30"
-  // "compatibility_flags": [
-  //   "nodejs_compat"
-  // ],
+  "compatibility_date": "2026-07-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "queues": {
+    "producers": [
+      {
+        "binding": "CONTENT_QUEUE",
+        "queue": "brainly-content-processing",
+      },
+    ],
+    "consumers": [
+      {
+        "queue": "brainly-content-processing",
+        "max_batch_size": 10,
+        "max_batch_timeout": 5,
+      },
+    ],
+  },
   // "vars": {
   //   "MY_VAR": "my-variable"
   // },
@@ -28,11 +41,14 @@
   //     "database_id": ""
   //   }
   // ],
-  // "ai": {
-  //   "binding": "AI"
-  // },
+  "ai": {
+    "binding": "AI",
+  },
   // "observability": {
   //   "enabled": true,
   //   "head_sampling_rate": 1
-  // }
+  // },
+  "secrets": {
+    "required": ["DATABASE_URL"],
+  },
 }

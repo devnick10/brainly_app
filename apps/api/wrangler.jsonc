@@ -11,13 +11,6 @@
         "queue": "brainly-content-processing",
       },
     ],
-    "consumers": [
-      {
-        "queue": "brainly-content-processing",
-        "max_batch_size": 10,
-        "max_batch_timeout": 5,
-      },
-    ],
   },
   // "vars": {
   //   "MY_VAR": "my-variable"
