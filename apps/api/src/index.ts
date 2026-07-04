@@ -1,14 +1,16 @@
+import { createPrismaClient } from '@brainly/db';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { createMiddleware } from 'hono/factory';
 import { logger } from 'hono/logger';
-import { createPrismaClient } from '@brainly/db';
+import errorMiddleware from './middlewares/globalError';
 import { brainRouter } from './routes/brain';
 import { userRouter } from './routes/user';
 import { AppContext } from './types';
 
 const app = new Hono<AppContext>();
 
+// CORS MIDDLEWARE
 app.use(
   '*',
   cors({
@@ -23,6 +25,10 @@ app.use(
   }),
 );
 
+// GLOBAL ERROR HANDLER
+app.use('/api/*', errorMiddleware());
+
+// PRISMA CLIENT MIDDLEWARE
 app.use(
   '/api/*',
   createMiddleware<AppContext>(async (c, next) => {
@@ -33,12 +39,15 @@ app.use(
   }),
 );
 
+// LOGGER
 app.use(logger());
 
+// HEALTH CHECK
 app.get('/', (c) => {
   return c.text('Hello Hono!');
 });
 
+// APP ROUTES
 app.route('/api/v1/brain', brainRouter);
 app.route('/api/v1/user', userRouter);
 

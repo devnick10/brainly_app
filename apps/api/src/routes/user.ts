@@ -5,6 +5,7 @@ import { AppContext } from '../types';
 import { signinSchema, signupSchema, googleSchema } from '../schema/userSchema';
 import { zValidator } from '../middlewares/validator';
 import { authMiddleware } from '../middlewares/auth';
+import { compare, hash } from 'bcryptjs';
 
 const userRouter = new Hono<AppContext>();
 
@@ -18,8 +19,10 @@ userRouter.post('/signup', zValidator('json', signupSchema), async (c) => {
       throw new HTTPException(409, { message: 'User already signed up' });
     }
 
+    const hashedPassword = await hash(password, 10);
+
     const user = await prisma.user.create({
-      data: { email, password },
+      data: { email, password: hashedPassword },
     });
 
     const token = await new SignJWT({ id: user.id })
@@ -46,7 +49,12 @@ userRouter.post('/signin', zValidator('json', signinSchema), async (c) => {
       where: { email },
     });
 
-    if (!user || user.password !== password) {
+    if (!user) {
+      throw new HTTPException(401, { message: 'Incorrect credentials' });
+    }
+
+    const isValid = await compare(password, user.password);
+    if (!isValid) {
       throw new HTTPException(401, { message: 'Incorrect credentials' });
     }
 

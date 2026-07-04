@@ -48,6 +48,7 @@
       "ACCESS_ORIGIN",
       "DEV_ACCESS_ORIGIN",
       "GOOGLE_CLIENT_ID",
+      "NODE_ENV",
     ],
   },
 }

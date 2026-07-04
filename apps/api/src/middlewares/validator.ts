@@ -13,6 +13,6 @@ export const zValidator = <
   // eslint-disable-next-line
   zv(target, schema, (result, c) => {
     if (!result.success) {
-      throw new HTTPException(400, { message: result.error.toString() });
+      throw new HTTPException(400, { message: 'Invalid input' });
     }
   });

@@ -5,6 +5,7 @@ export type Bindings = {
   DATABASE_URL: string;
   JWT_SECRET: string;
   GOOGLE_CLIENT_ID: string;
+  NODE_ENV: string;
   AI: Ai;
   CONTENT_QUEUE: Queue;
 };
