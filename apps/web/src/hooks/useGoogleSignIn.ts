@@ -24,7 +24,7 @@ export function useGoogleSignIn(successMessage: string) {
         },
       });
     }
-  }, []);
+  }, [handleResponse]);
 
   function handleResponse(accessToken: string) {
     setIsPending(true);
