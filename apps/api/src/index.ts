@@ -15,11 +15,18 @@ app.use(
   '*',
   cors({
     origin: (origin, c) => {
-      const ctx = c;
-      if (origin === c.env.DEV_ACCESS_ORIGIN) {
+      // 1. Allow server-to-server or tool traffic that lacks an origin header
+      if (!origin) return '';
+
+      // 2. Strict match against environments
+      if (
+        origin === c.env.DEV_ACCESS_ORIGIN ||
+        origin === c.env.PROD_ACCESS_ORIGIN
+      ) {
         return origin;
       }
-      return ctx.env?.ACCESS_ORIGIN || origin;
+      // 3. Explicitly reject all other origins
+      return '';
     },
     credentials: true,
   }),
