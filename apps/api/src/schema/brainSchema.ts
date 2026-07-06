@@ -18,4 +18,6 @@ const DeleteContentSchema = z.object({
   contentId: z.string(),
 });
 
-export { CreateContentSchema, DeleteContentSchema };
+const ShareLinkSchema = z.string().min(10);
+
+export { CreateContentSchema, DeleteContentSchema, ShareLinkSchema };

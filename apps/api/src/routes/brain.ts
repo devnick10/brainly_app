@@ -3,7 +3,7 @@ import { HTTPException } from 'hono/http-exception';
 import { publisher } from '../lib/publisher';
 import { authMiddleware } from '../middlewares/auth';
 import { zValidator } from '../middlewares/validator';
-import { CreateContentSchema } from '../schema/brainSchema';
+import { CreateContentSchema, ShareLinkSchema } from '../schema/brainSchema';
 import { AppContext, SearchResult } from '../types';
 import { generateEmbedding } from '@brainly/ai';
 
@@ -155,7 +155,7 @@ brainRouter.post('/share', authMiddleware, async (c) => {
         return c.json({ success: true, hash: linkExist.hash });
       }
 
-      const hash = crypto.randomUUID().replace(/-/g, '').slice(0, 10);
+      const hash = crypto.randomUUID().replace(/-/g, '');
 
       await prisma.link.create({
         data: { hash, userId },
@@ -173,27 +173,39 @@ brainRouter.post('/share', authMiddleware, async (c) => {
   }
 });
 
-brainRouter.get('/:sharelink', async (c) => {
-  try {
-    const prisma = c.get('prisma');
-    const hash = c.req.param('sharelink');
-
-    const link = await prisma.link.findFirst({ where: { hash } });
-
-    if (!link) {
-      return c.json({ success: false, message: 'sorry incorrect inputs' });
+brainRouter.get(
+  '/:sharelink',
+  zValidator('json', ShareLinkSchema),
+  async (c) => {
+    //TODO: verify  schema ans impelemtation with ai ;
+    const isValidId = /^[a-fA-F0-9]{32}$/.test(c.req.valid('json'));
+    if (!isValidId) {
+      return c.json({ success: false, message: 'Invalid share link' });
     }
 
-    const content = await prisma.content.findMany({
-      where: { userId: link.userId },
-      include: { user: { select: { email: true } } },
-    });
+    try {
+      const prisma = c.get('prisma');
+      const hash = c.req.param('sharelink');
 
-    return c.json({ success: true, content });
-  } catch (error) {
-    console.error(error);
-    throw new HTTPException(500, { message: 'Failed to get brain.' });
-  }
-});
+      const link = await prisma.link.findFirst({ where: { hash } });
+
+      if (!link) {
+        return c.json({ success: false, message: 'sorry incorrect inputs' });
+      }
+
+      const content = await prisma.content.findMany({
+        where: { userId: link.userId },
+        omit: {
+          searchableText: true,
+        },
+      });
+
+      return c.json({ success: true, content });
+    } catch (error) {
+      console.error(error);
+      throw new HTTPException(500, { message: 'Failed to get brain.' });
+    }
+  },
+);
 
 export { brainRouter };

@@ -2,7 +2,17 @@ import z from 'zod';
 
 const signinSchema = z.object({
   email: z.email().min(3).max(50),
-  password: z.string().min(4).max(100),
+  password: z
+    .string()
+    .min(10)
+    .max(100)
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number')
+    .regex(
+      /[^A-Za-z0-9]/,
+      'Password must contain at least one special character',
+    ),
 });
 
 const signupSchema = signinSchema;
