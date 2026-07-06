@@ -75,7 +75,7 @@ model Tag {
 
 model Link {
   id   String @id @default(cuid())
-  hash String
+  hash String @unique
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
