@@ -100,6 +100,10 @@ The application is built on Cloudflare's edge platform using an event-driven arc
 
 ---
 
+# Authentication Architecture
+
+![Authentication Architecture](https://res.cloudinary.com/dnr1sgjrx/image/upload/v1783442681/brainly/auth__arch_ps7hei.png)
+
 # Repository Structure
 
 ```text
