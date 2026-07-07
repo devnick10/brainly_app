@@ -1,5 +1,7 @@
 import { Search, Link, Tags, Share2, Zap, Shield } from 'lucide-react';
 
+export const ACCESS_TOKEN_KEY = 'access_token' as const;
+
 export const features = [
   {
     icon: Search,

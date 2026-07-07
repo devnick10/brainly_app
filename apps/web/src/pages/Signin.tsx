@@ -12,6 +12,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { AxiosError } from 'axios';
+import { ACCESS_TOKEN_KEY } from '@/lib/constants';
 
 export default function Signin() {
   const [email, setEmail] = useState('');
@@ -36,7 +37,7 @@ export default function Signin() {
       { email, password },
       {
         onSuccess: (data) => {
-          localStorage.setItem('token', String(data.token));
+          localStorage.setItem(ACCESS_TOKEN_KEY, String(data.token));
           toast.success('Signed in successfully');
           navigate('/dashboard');
         },

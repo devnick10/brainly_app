@@ -3,17 +3,17 @@ import { useQuery } from '@tanstack/react-query';
 import type { ReactElement } from 'react';
 import { Navigate } from 'react-router-dom';
 import { DashboardSkeleton } from './skeltons/DashboardSkelton';
+import { ACCESS_TOKEN_KEY } from '@/lib/constants';
 
 export default function PrivateRoute({ children }: { children: ReactElement }) {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
   const { isLoading, data } = useQuery({
     queryFn: getUser,
     queryKey: ['user'],
   });
 
   if (!token) {
-    <Navigate to="/signin" />;
-    return;
+    return <Navigate to="/signin" />;
   }
 
   if (isLoading) {
@@ -21,7 +21,7 @@ export default function PrivateRoute({ children }: { children: ReactElement }) {
   }
 
   if (!data?.user) {
-    <Navigate to="/signin" />;
+    return <Navigate to="/signin" />;
   }
 
   return children;

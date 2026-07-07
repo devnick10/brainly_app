@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { googleSignIn } from '../api/googleSignIn';
+import { ACCESS_TOKEN_KEY } from '@/lib/constants';
 
 export function useGoogleSignIn(successMessage: string) {
   const [isPending, setIsPending] = useState(false);
@@ -30,7 +31,7 @@ export function useGoogleSignIn(successMessage: string) {
     setIsPending(true);
     googleSignIn(accessToken)
       .then((data) => {
-        localStorage.setItem('token', String(data.token));
+        localStorage.setItem(ACCESS_TOKEN_KEY, String(data.token));
         toast.success(successMessage);
         navigate('/dashboard');
       })

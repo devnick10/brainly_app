@@ -1,13 +1,21 @@
 import axios from 'axios';
 import { config } from './config';
+import { ACCESS_TOKEN_KEY } from './constants';
 
 export const apiClient = axios.create({
   baseURL: config.apiBaseUrl,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${String(localStorage.getItem('token'))}`,
   },
+});
+
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 // Flag to prevent multiple refresh calls if several requests fail at once
@@ -29,7 +37,9 @@ const processQueue = (error: unknown | Error | null, token = null) => {
 };
 
 apiClient.interceptors.response.use(
-  (response) => response, // Pass through successful responses
+  (response) => {
+    return response;
+  }, // Pass through successful responses
   async (error) => {
     const originalRequest = error.config;
 
@@ -54,19 +64,19 @@ apiClient.interceptors.response.use(
 
         try {
           // 3. Call your refresh token endpoint
-          const response = await apiClient.get('/refresh');
+          const response = await apiClient.post('/user/refresh');
 
-          const { accessToken } = response.data;
+          const { token } = response.data;
 
           // 4. Save the new tokens
-          localStorage.setItem('access_token', accessToken);
+          localStorage.setItem(ACCESS_TOKEN_KEY, token);
 
           // 5. Update fallback authorization headers
           apiClient.defaults.headers.common['Authorization'] =
-            'Bearer ' + accessToken;
-          originalRequest.headers['Authorization'] = 'Bearer ' + accessToken;
+            'Bearer ' + token;
+          originalRequest.headers['Authorization'] = 'Bearer ' + token;
 
-          processQueue(null, accessToken);
+          processQueue(null, token);
           return apiClient(originalRequest); // Retry the original request
         } catch (refreshError) {
           processQueue(refreshError, null);
