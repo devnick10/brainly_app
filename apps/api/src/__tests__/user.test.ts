@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
 import { Hono } from 'hono';
 import { createMiddleware } from 'hono/factory';
 import { SignJWT } from 'jose';
@@ -22,10 +22,11 @@ function createTestApp() {
 }
 
 async function createToken(userId = 'user-1') {
-  return await new SignJWT({ id: userId })
+  return await new SignJWT({})
     .setProtectedHeader({ alg: 'HS256' })
+    .setSubject(userId)
     .setExpirationTime('1h')
-    .sign(new TextEncoder().encode(mockEnv.JWT_SECRET));
+    .sign(new TextEncoder().encode(mockEnv.ACCESS_TOKEN_SECRET));
 }
 
 beforeEach(() => {
@@ -53,7 +54,10 @@ describe('POST /api/v1/user/signup', () => {
       new Request('http://localhost/api/v1/user/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'new@test.com', password: '123456' }),
+        body: JSON.stringify({
+          email: 'new@test.com',
+          password: 'Test@123456',
+        }),
       }),
       mockEnv,
     );
@@ -76,14 +80,15 @@ describe('POST /api/v1/user/signup', () => {
       new Request('http://localhost/api/v1/user/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'exists@test.com', password: '123456' }),
+        body: JSON.stringify({
+          email: 'exists@test.com',
+          password: 'Test@123456',
+        }),
       }),
       mockEnv,
     );
 
-    // HTTPException(409) is thrown inside try/catch
-    // which re-throws as 500 — this is existing code behavior
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(409);
   });
 });
 
@@ -91,17 +96,20 @@ describe('POST /api/v1/user/signin', () => {
   it('signs in with correct credentials', async () => {
     const app = createTestApp();
 
+    const storedHash =
+      '$2b$10$g.K7hzmSMR/q53d2/WxAoOlnIAub3tnHJDgZrjhb06nOc2mvNvZiK';
+
     (mockPrisma.user.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
       id: 'user-1',
       email: 'a@b.com',
-      password: '123456',
+      password: storedHash,
     });
 
     const res = await app.fetch(
       new Request('http://localhost/api/v1/user/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'a@b.com', password: '123456' }),
+        body: JSON.stringify({ email: 'a@b.com', password: 'Test@123456' }),
       }),
       mockEnv,
     );
@@ -115,24 +123,25 @@ describe('POST /api/v1/user/signin', () => {
   it('returns 401 with wrong password', async () => {
     const app = createTestApp();
 
+    const storedHash =
+      '$2b$10$g.K7hzmSMR/q53d2/WxAoOlnIAub3tnHJDgZrjhb06nOc2mvNvZiK';
+
     (mockPrisma.user.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
       id: 'user-1',
       email: 'a@b.com',
-      password: 'correct-password',
+      password: storedHash,
     });
 
     const res = await app.fetch(
       new Request('http://localhost/api/v1/user/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'a@b.com', password: 'wrong' }),
+        body: JSON.stringify({ email: 'a@b.com', password: 'Wrong@Password1' }),
       }),
       mockEnv,
     );
 
-    // HTTPException(401) is thrown inside try/catch
-    // which re-throws as 500 — this is existing code behavior
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(401);
   });
 });
 
@@ -173,5 +182,89 @@ describe('GET /api/v1/user/me', () => {
     );
 
     expect(res.status).toBe(401);
+  });
+});
+
+describe('POST /api/v1/user/logout', () => {
+  it('returns 401 without auth header', async () => {
+    const app = createTestApp();
+
+    const res = await app.fetch(
+      new Request('http://localhost/api/v1/user/logout', {
+        method: 'POST',
+      }),
+      mockEnv,
+    );
+
+    expect(res.status).toBe(401);
+  });
+
+  it('logs out without refresh token cookie', async () => {
+    const app = createTestApp();
+    const token = await createToken();
+
+    (mockPrisma.session.update as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: 'session-1',
+      revokedAt: new Date(),
+    });
+
+    const res = await app.fetch(
+      new Request('http://localhost/api/v1/user/logout', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+      mockEnv,
+    );
+
+    const data = await res.json();
+    expect(res.status).toBe(200);
+    expect(data.success).toBe(true);
+    expect(data.message).toBe('Logged out successfully');
+  });
+
+  it('revokes session when refresh token cookie is present', async () => {
+    const app = createTestApp();
+    const token = await createToken();
+
+    (mockPrisma.session.update as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: 'session-1',
+      revokedAt: new Date(),
+    });
+
+    const res = await app.fetch(
+      new Request('http://localhost/api/v1/user/logout', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Cookie: 'refreshToken=valid-refresh-token-jwt',
+        },
+      }),
+      mockEnv,
+    );
+
+    const data = await res.json();
+    expect(res.status).toBe(200);
+    expect(data.success).toBe(true);
+    expect(data.message).toBe('Logged out successfully');
+  });
+
+  it('logs out even with invalid refresh token', async () => {
+    const app = createTestApp();
+    const token = await createToken();
+
+    const res = await app.fetch(
+      new Request('http://localhost/api/v1/user/logout', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Cookie: 'refreshToken=invalid-jwt',
+        },
+      }),
+      mockEnv,
+    );
+
+    const data = await res.json();
+    expect(res.status).toBe(200);
+    expect(data.success).toBe(true);
   });
 });
