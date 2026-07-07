@@ -28,7 +28,7 @@ export interface Content {
   imageUrl?: string;
   siteName?: string;
   author?: string;
-  tags: { id: string; title: string }[];
+  tags?: { id: string; title: string }[];
   userId: string;
   user?: { email: string };
 }

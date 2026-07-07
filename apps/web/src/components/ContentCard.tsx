@@ -139,7 +139,7 @@ export const ContentCard: React.FC<ContentCardProps> = (
         )}
       </CardContent>
 
-      {props.tags.length > 0 && (
+      {props.tags && props.tags.length > 0 && (
         <div className="px-6 pb-2">
           <div className="flex flex-wrap gap-1">
             {props.tags.map((tag) => (
