@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Brain, Home, Twitter, Youtube, LogOut } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { Button } from './ui/button';
@@ -25,6 +26,16 @@ export function SideBar({
   onNav,
 }: SideBarProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const { mutate: logout, isPending: isLoggingOut } = useMutation({
+    mutationFn: logoutUser,
+    onSettled: () => {
+      queryClient.clear();
+      localStorage.removeItem(ACCESS_TOKEN_KEY);
+      navigate('/signin');
+    },
+  });
 
   const items = [
     {
@@ -85,15 +96,8 @@ export function SideBar({
           <Button
             variant="outline"
             className="w-full justify-start gap-3"
-            onClick={async () => {
-              try {
-                await logoutUser();
-              } catch {
-                // Proceed with local logout even if API call fails
-              }
-              localStorage.removeItem(ACCESS_TOKEN_KEY);
-              navigate('/signin');
-            }}
+            onClick={() => logout()}
+            disabled={isLoggingOut}
           >
             <LogOut className="h-4 w-4" />
             Logout
