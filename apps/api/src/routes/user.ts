@@ -7,35 +7,14 @@ import { authMiddleware } from '../middlewares/auth';
 import { zValidator } from '../middlewares/validator';
 import { googleSchema, signinSchema, signupSchema } from '../schema/userSchema';
 import { AppContext } from '../types';
-import { success, error } from '../lib/response';
+import { success } from '../lib/response';
+import { onError } from '../middlewares/globalError';
 import * as authService from '../services/auth.service';
 import * as userService from '../services/user.service';
 
 const userRouter = new Hono<AppContext>();
 
-userRouter.onError(async (err, c) => {
-  const isProd = (c.env?.NODE_ENV || 'production') === 'production';
-  if (!isProd) {
-    console.error('[Middleware Catch]:', err);
-  }
-
-  if (err instanceof HTTPException) {
-    return error(c, err.message, err.status, err.cause);
-  }
-
-  const errorMessage = err instanceof Error ? err.message : 'Unknown Error';
-  return isProd
-    ? error(c, errorMessage, 500)
-    : c.json(
-        {
-          success: false,
-          message: errorMessage,
-          debug: err instanceof Error ? err.message : String(err),
-          stack: err instanceof Error ? err.stack : undefined,
-        },
-        500,
-      );
-});
+userRouter.onError(onError);
 
 userRouter.post('/signup', zValidator('json', signupSchema), async (c) => {
   try {

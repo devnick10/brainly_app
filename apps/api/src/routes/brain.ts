@@ -4,13 +4,13 @@ import { authMiddleware } from '../middlewares/auth';
 import { zValidator } from '../middlewares/validator';
 import { CreateContentSchema, ShareLinkSchema } from '../schema/brainSchema';
 import { AppContext } from '../types';
-import errorMiddleware from '../middlewares/globalError';
 import { success, error } from '../lib/response';
+import { onError } from '../middlewares/globalError';
 import * as contentService from '../services/content.service';
 
 const brainRouter = new Hono<AppContext>();
 
-brainRouter.use('*', errorMiddleware());
+brainRouter.onError(onError);
 
 brainRouter.get('/search', authMiddleware, async (c) => {
   const query = c.req.query('q')?.trim();

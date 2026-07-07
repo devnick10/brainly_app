@@ -1,42 +1,34 @@
-import { MiddlewareHandler } from 'hono';
+import type { ErrorHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
-const errorMiddleware = (): MiddlewareHandler => {
-  return async (c, next) => {
-    try {
-      await next();
-    } catch (err) {
-      const isProd = (c.env?.NODE_ENV || 'production') === 'production';
+export const onError: ErrorHandler = (err, c) => {
+  const isProd = (c.env?.NODE_ENV || 'production') === 'production';
 
-      if (!isProd) {
-        console.error('[Middleware Catch]:', err);
-      }
+  if (!isProd) {
+    console.error('[Error Handler]:', err);
+  }
 
-      // 1. Manually intercept HTTPException instead of relying on err.getResponse()
-      if (err instanceof HTTPException) {
-        return c.json(
-          {
-            success: false,
-            message: err.message,
-            cause: err.cause,
-          },
-          err.status,
-        );
-      }
+  if (err instanceof HTTPException) {
+    return c.json(
+      {
+        success: false,
+        message: err.message,
+        cause: err.cause,
+      },
+      err.status,
+    );
+  }
 
-      // 2. Generic fallback errors (500)
-      const errorMessage = err instanceof Error ? err.message : 'Unknown Error';
-      const errorBody = isProd
-        ? { success: false, message: errorMessage }
-        : {
-            success: false,
-            message: errorMessage,
-            debug: err instanceof Error ? err.message : String(err),
-            stack: err instanceof Error ? err.stack : undefined,
-          };
-      return c.json(errorBody, 500);
-    }
-  };
+  const errorMessage = err instanceof Error ? err.message : 'Unknown Error';
+  return isProd
+    ? c.json({ success: false, message: errorMessage }, 500)
+    : c.json(
+        {
+          success: false,
+          message: errorMessage,
+          debug: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        },
+        500,
+      );
 };
-
-export default errorMiddleware;
