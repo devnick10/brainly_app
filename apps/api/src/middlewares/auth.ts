@@ -8,17 +8,18 @@ export const authMiddleware = createMiddleware<AppContext>(async (c, next) => {
   if (!authHeader) {
     throw new HTTPException(401, { message: 'Unauthorized' });
   }
+
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
     try {
       const { payload } = await jwtVerify(
         token,
-        new TextEncoder().encode(c.env.JWT_SECRET),
+        new TextEncoder().encode(c.env.ACCESS_TOKEN_SECRET),
       );
-      if (!payload.id) {
+      if (!payload.sub) {
         throw new HTTPException(401, { message: 'Unauthorized' });
       }
-      c.set('userId', payload.id as string);
+      c.set('userId', payload.sub as string);
     } catch (error) {
       if (error instanceof Error && error.name === 'JWTExpired') {
         throw new HTTPException(401, {

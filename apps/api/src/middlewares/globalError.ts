@@ -16,6 +16,7 @@ const errorMiddleware = (): MiddlewareHandler => {
       if (err instanceof HTTPException) {
         return c.json(
           {
+            success: false,
             message: err.message,
             cause: err.cause,
           },
@@ -26,8 +27,9 @@ const errorMiddleware = (): MiddlewareHandler => {
       // 2. Generic fallback errors (500)
       const errorMessage = err instanceof Error ? err.message : 'Unknown Error';
       const errorBody = isProd
-        ? { message: errorMessage }
+        ? { success: false, message: errorMessage }
         : {
+            success: false,
             message: errorMessage,
             debug: err instanceof Error ? err.message : String(err),
             stack: err instanceof Error ? err.stack : undefined,

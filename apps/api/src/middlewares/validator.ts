@@ -10,14 +10,17 @@ export const zValidator = <
   target: Target,
   schema: T,
 ) =>
-   
   zv(target, schema, (result, c) => {
     if (!result.success) {
       const formattedError = formatZodError(
         result.error as unknown as z.ZodError,
       );
       return c.json(
-        { message: formattedError.message, cause: formattedError.errors },
+        {
+          success: false,
+          message: formattedError.message,
+          cause: formattedError.errors,
+        },
         400,
       );
     }
