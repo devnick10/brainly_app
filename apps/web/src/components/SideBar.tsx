@@ -3,6 +3,8 @@ import { Brain, Home, Twitter, Youtube, LogOut } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { Button } from './ui/button';
 import { Separator } from './ui/separator';
+import { ACCESS_TOKEN_KEY } from '@/lib/constants';
+import { logoutUser } from '@/api/logoutUser';
 import type { ContentType } from '@/lib/types';
 
 interface SideBarProps {
@@ -83,9 +85,14 @@ export function SideBar({
           <Button
             variant="outline"
             className="w-full justify-start gap-3"
-            onClick={() => {
-              localStorage.removeItem('token');
-              navigate('/');
+            onClick={async () => {
+              try {
+                await logoutUser();
+              } catch {
+                // Proceed with local logout even if API call fails
+              }
+              localStorage.removeItem(ACCESS_TOKEN_KEY);
+              navigate('/signin');
             }}
           >
             <LogOut className="h-4 w-4" />

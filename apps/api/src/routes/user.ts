@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { getCookie, setCookie } from 'hono/cookie';
+import { jwtVerify } from 'jose';
 import { JOSEError, JWTExpired } from 'jose/errors';
 import { createSession } from '../lib/session';
 import { authMiddleware } from '../middlewares/auth';
@@ -97,6 +98,35 @@ userRouter.get('/me', authMiddleware, async (c) => {
     if (error instanceof HTTPException) throw error;
     console.error(error);
     throw new HTTPException(500, { message: 'Internal server error' });
+  }
+});
+
+userRouter.post('/logout', authMiddleware, async (c) => {
+  try {
+    const prisma = c.get('prisma');
+    const incomingRefreshToken = getCookie(c, 'refreshToken');
+    let sessionId: string | undefined;
+
+    if (incomingRefreshToken) {
+      try {
+        const { payload } = await jwtVerify(
+          incomingRefreshToken,
+          new TextEncoder().encode(c.env.REFRESH_TOKEN_SECRET),
+        );
+        sessionId = payload.sid as string;
+      } catch {
+        // Token invalid or expired — best-effort revocation
+      }
+    }
+
+    await authService.logout(prisma, sessionId);
+
+    setCookie(c, 'refreshToken', '', { maxAge: 0, path: '/' });
+
+    return success(c, { message: 'Logged out successfully' });
+  } catch (error) {
+    console.error(error);
+    throw new HTTPException(500, { message: 'Failed to logout' });
   }
 });
 

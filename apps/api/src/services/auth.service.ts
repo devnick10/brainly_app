@@ -113,6 +113,18 @@ export async function resetPassword(
   }
 }
 
+export async function logout(
+  prisma: ExtendedPrismaClient,
+  sessionId?: string,
+): Promise<void> {
+  if (sessionId) {
+    await prisma.session.update({
+      where: { id: sessionId },
+      data: { revokedAt: new Date() },
+    });
+  }
+}
+
 export async function refreshSession(
   prisma: ExtendedPrismaClient,
   env: AppContext['Bindings'],
