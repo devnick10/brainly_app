@@ -20,9 +20,11 @@ export function DashboardSkeleton() {
       <aside className="hidden w-64 border-r bg-card lg:block">
         <div className="flex h-full flex-col gap-4 p-4">
           {/* Logo */}
-          <div className="flex items-center gap-2 px-2">
-            <Brain className="h-6 w-6 text-muted-foreground" />
-            <span className="h-6 w-16 rounded bg-muted" />
+          <div className="flex items-center gap-3 px-1">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
+              <Brain className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <span className="h-5 w-16 rounded bg-muted" />
           </div>
           <Separator />
 
@@ -36,10 +38,13 @@ export function DashboardSkeleton() {
               <div
                 key={index}
                 className={cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2',
+                  'relative flex items-center gap-3 rounded-lg px-3 py-2',
                   index === 0 ? 'bg-accent' : 'bg-muted/50',
                 )}
               >
+                {index === 0 && (
+                  <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-muted-foreground/30" />
+                )}
                 <item.icon className="h-4 w-4 text-muted-foreground" />
                 <span className="h-4 w-20 rounded bg-muted-foreground/20" />
               </div>
@@ -59,7 +64,7 @@ export function DashboardSkeleton() {
       {/* Main Content */}
       <main className="flex flex-1 flex-col overflow-hidden">
         {/* Header Skeleton */}
-        <header className="border-b bg-card px-4 py-3 sm:px-6 sm:py-4">
+        <header className="border-b bg-card px-4 py-3 sm:px-6">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               {/* Mobile Menu Button */}
@@ -70,26 +75,24 @@ export function DashboardSkeleton() {
               </div>
 
               {/* Title */}
-              <div>
-                <div className="h-6 w-24 rounded bg-muted sm:h-7 sm:w-32" />
-              </div>
+              <div className="h-5 w-24 rounded bg-muted sm:h-6 sm:w-32" />
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               {/* Search Bar */}
               <div className="relative hidden sm:block">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <div className="h-10 w-48 rounded-md border border-border bg-background pl-9 lg:w-64" />
+                <div className="h-9 w-40 rounded-md border border-border bg-background pl-9 lg:w-56" />
               </div>
 
               {/* Share Button */}
-              <div className="hidden h-10 w-20 rounded-md border border-border bg-background sm:flex sm:items-center sm:justify-center sm:gap-2">
+              <div className="hidden h-9 w-[68px] rounded-md border border-border bg-background sm:flex sm:items-center sm:justify-center sm:gap-2">
                 <Share2 className="h-4 w-4 text-muted-foreground" />
-                <span className="h-3 w-12 rounded bg-muted" />
+                <span className="h-3 w-10 rounded bg-muted" />
               </div>
 
               {/* Add Content Button */}
-              <div className="flex h-10 w-28 items-center justify-center gap-2 rounded-md bg-primary/60">
+              <div className="flex h-9 w-[118px] items-center justify-center gap-2 rounded-md bg-primary/60">
                 <Plus className="h-4 w-4 text-primary-foreground" />
                 <span className="h-3 w-16 rounded bg-primary-foreground/60" />
               </div>

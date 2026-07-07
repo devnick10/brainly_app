@@ -1,10 +1,9 @@
 import { createLink } from '@/api/createLink';
 import type { ContentType } from '@/lib/types';
 import { useMutation } from '@tanstack/react-query';
-import { Menu, Plus, Search, Share2 } from 'lucide-react';
+import { Menu, Plus, Share2 } from 'lucide-react';
 import React from 'react';
 import { toast } from 'sonner';
-import { Input } from '../components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '../components/ui/sheet';
 import { SideBar } from './SideBar';
 import { Button } from './ui/button';
@@ -13,8 +12,6 @@ interface DashbaordHeaderProps {
   setActiveFilter: (t: ContentType | 'all') => void;
   activeFilter: ContentType | 'all';
   setModelOpen: (v: boolean) => void;
-  setSearchQuery: (s: string) => void;
-  searchQuery: string;
 }
 
 export const DashbaordHeader: React.FC<DashbaordHeaderProps> = (props) => {
@@ -31,7 +28,7 @@ export const DashbaordHeader: React.FC<DashbaordHeaderProps> = (props) => {
   });
 
   return (
-    <header className="border-b bg-card px-4 py-3 sm:px-6 sm:py-4">
+    <header className="border-b bg-card px-4 py-3 sm:px-6">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Sheet>
@@ -49,37 +46,26 @@ export const DashbaordHeader: React.FC<DashbaordHeaderProps> = (props) => {
               />
             </SheetContent>
           </Sheet>
-          <div>
-            <h1 className="text-xs  text-wrap font-semibold sm:text-xl">
-              {props.activeFilter === 'all'
-                ? 'All Notes'
-                : props.activeFilter === 'YOUTUBE'
-                  ? 'YouTube Videos'
-                  : 'Twitter Posts'}
-            </h1>
-          </div>
+          <h1 className="text-sm font-semibold sm:text-lg">
+            {props.activeFilter === 'all'
+              ? 'All Notes'
+              : props.activeFilter === 'YOUTUBE'
+                ? 'YouTube Videos'
+                : 'Twitter Posts'}
+          </h1>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="relative hidden sm:block">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search..."
-              value={props.searchQuery}
-              onChange={(e) => props.setSearchQuery(e.target.value)}
-              className="w-48 pl-9 lg:w-64"
-            />
-          </div>
+        <div className="flex items-center gap-2">
           <Button
             variant="outline"
             className="hidden sm:flex"
             onClick={() => shareMutate({ share: true })}
             disabled={isSharing}
           >
-            <Share2 className="mr-2 size-1 sm:size-6" />
+            <Share2 className="mr-2 h-4 w-4" />
             Share
           </Button>
-          <Button size="sm" onClick={() => props.setModelOpen(true)}>
-            <Plus className="mr-2 size-1 sm:size-6" />
+          <Button onClick={() => props.setModelOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
             Add Content
           </Button>
         </div>

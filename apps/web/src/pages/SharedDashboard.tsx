@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Menu, Brain, ArrowLeft, Search } from 'lucide-react';
+import { Menu, Brain, ArrowLeft } from 'lucide-react';
+import { SearchBar } from '@/components/SearchBar';
 import { ContentCard } from '../components/ContentCard';
 import { SideBar } from '../components/SideBar';
 import { sharedBrain } from '../api/sharedBrain';
-import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '../components/ui/sheet';
 import type { Content } from '../lib/types';
@@ -57,7 +57,7 @@ export default function SharedDashboard() {
         />
       </aside>
       <main className="flex flex-1 flex-col overflow-hidden">
-        <header className="border-b bg-card px-4 py-3 sm:px-6 sm:py-4">
+        <header className="border-b bg-card px-4 py-3 sm:px-6">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <Sheet>
@@ -84,28 +84,16 @@ export default function SharedDashboard() {
               <div>
                 <div className="flex items-center gap-2">
                   <Brain className="h-5 w-5 text-primary" />
-                  <h1 className="text-lg font-semibold sm:text-xl">
+                  <h1 className="text-sm font-semibold sm:text-lg">
                     Shared Brain
                   </h1>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {filteredData.length} item
-                  {filteredData.length !== 1 ? 's' : ''}
-                </p>
               </div>
-            </div>
-            <div className="relative hidden sm:block">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-48 pl-9 lg:w-64"
-              />
             </div>
           </div>
         </header>
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto">
+          <SearchBar value={searchQuery} onChange={setSearchQuery} />
           {isLoading && (
             <div className="flex h-full items-center justify-center">
               <p className="text-muted-foreground">Loading...</p>
@@ -113,7 +101,14 @@ export default function SharedDashboard() {
           )}
           {error && (
             <div className="flex h-full items-center justify-center">
-              <p className="text-destructive">Error loading shared content</p>
+              <div className="text-center">
+                <p className="text-destructive font-medium">
+                  Failed to load shared content
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  The link may be invalid or expired
+                </p>
+              </div>
             </div>
           )}
           {!isLoading && !error && filteredData.length === 0 && (
@@ -124,10 +119,12 @@ export default function SharedDashboard() {
             </div>
           )}
           {!isLoading && !error && filteredData.length > 0 && (
-            <div className="flex flex-wrap gap-4">
-              {filteredData.map((content) => (
-                <ContentCard key={content.id} {...content} />
-              ))}
+            <div className="p-6">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {filteredData.map((content) => (
+                  <ContentCard key={content.id} {...content} />
+                ))}
+              </div>
             </div>
           )}
         </div>

@@ -45,7 +45,7 @@ describe('LandingPage', () => {
 
   it('renders the how it works section', () => {
     renderPage();
-    expect(screen.getByText('How It Works')).toBeInTheDocument();
+    expect(screen.getByText('From Link to Insight')).toBeInTheDocument();
   });
 
   it('renders the CTA section at bottom', () => {

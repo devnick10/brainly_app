@@ -69,8 +69,10 @@ export function SideBar({
 
   return (
     <div className="flex h-full flex-col gap-4 p-4">
-      <div className="flex items-center gap-2 px-2">
-        <Brain className="h-6 w-6 text-primary" />
+      <div className="flex items-center gap-3 px-1">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+          <Brain className="h-4 w-4 text-primary-foreground" />
+        </div>
         <span className="font-semibold text-lg">Brainly</span>
       </div>
       <Separator />
@@ -80,13 +82,21 @@ export function SideBar({
             key={item.value}
             onClick={item.onClick}
             className={cn(
-              'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground',
+              'relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground',
               activeFilter === item.value
                 ? 'bg-accent text-accent-foreground'
                 : 'text-muted-foreground',
             )}
           >
-            <item.icon className="h-4 w-4" />
+            {activeFilter === item.value && (
+              <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-primary" />
+            )}
+            <item.icon
+              className={cn(
+                'h-4 w-4 transition-transform duration-200',
+                activeFilter === item.value && 'scale-110',
+              )}
+            />
             {item.label}
           </button>
         ))}
