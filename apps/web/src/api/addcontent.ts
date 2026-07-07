@@ -1,18 +1,7 @@
+import { apiClient } from '@/lib/axios';
 import type { ContentPayload } from '../lib/types';
 
 export async function addContent(data: ContentPayload) {
-  const response = await fetch(`${import.meta.env.VITE_BASE_URL}/brain`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${String(localStorage.getItem('token'))}`,
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to add content');
-  }
-
-  return await response.json();
+  const response = await apiClient.post(`/brain`, data);
+  return response.data;
 }

@@ -11,6 +11,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { AxiosError } from 'axios';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
@@ -39,8 +40,10 @@ export default function Signup() {
           toast.success('Account created successfully');
           navigate('/signin');
         },
-        onError: () => {
-          toast.error('Signup failed');
+        onError: (error) => {
+          if (error instanceof AxiosError) {
+            toast.error(Object.values(error.response?.data?.cause).join(', '));
+          }
         },
       },
     );

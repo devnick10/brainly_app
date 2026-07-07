@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from './ui/select';
 import type { ContentType } from '@/lib/types';
+import { AxiosError } from 'axios';
 
 interface CreateContentModelProps {
   open: boolean;
@@ -43,8 +44,10 @@ export function CreateContentModel({ open, onClose }: CreateContentModelProps) {
       setType('YOUTUBE');
       onClose();
     },
-    onError: () => {
-      toast.error('Failed to add content');
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        toast.error(Object.values(error.response?.data?.cause).join(', '));
+      }
     },
   });
 

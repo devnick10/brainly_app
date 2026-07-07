@@ -1,17 +1,16 @@
-export async function googleSignIn(accessToken: string) {
-  const response = await fetch(`${import.meta.env.VITE_BASE_URL}/user/google`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify({ credential: accessToken }),
-  });
+import { apiClient } from '@/lib/axios';
 
-  if (!response.ok) {
-    const err = await response.json().catch(() => null);
-    throw new Error(err?.message || 'Google sign in failed');
+export async function googleSignIn(accessToken: string) {
+  const response = await apiClient.post(
+    `${import.meta.env.VITE_BASE_URL}/user/google`,
+    {
+      credential: accessToken,
+    },
+  );
+
+  if (response.status !== 200) {
+    throw new Error('Google sign in failed');
   }
 
-  return await response.json();
+  return response.data;
 }
