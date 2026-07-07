@@ -12,6 +12,14 @@ export async function searchContent(
   ai: Ai,
 ): Promise<SearchResult> {
   const embedding = await generateEmbedding(query, ai);
+
+  if (
+    !Array.isArray(embedding) ||
+    !embedding.every((v) => typeof v === 'number' && isFinite(v))
+  ) {
+    throw new HTTPException(500, { message: 'Invalid embedding generated' });
+  }
+
   const embeddingStr = `[${embedding.join(',')}]`;
 
   const results = await prisma.$queryRaw<SearchResult>`

@@ -13,10 +13,12 @@ const brainRouter = new Hono<AppContext>();
 brainRouter.onError(onError);
 
 brainRouter.get('/search', authMiddleware, async (c) => {
-  const query = c.req.query('q')?.trim();
-  if (!query || query.length < 2) {
+  const rawQuery = c.req.query('q')?.trim();
+  if (!rawQuery || rawQuery.length < 2) {
     return success(c, { content: [] });
   }
+
+  const query = rawQuery.replace(/[^\x20-\x7E\s]/g, '');
 
   try {
     const prisma = c.get('prisma');
