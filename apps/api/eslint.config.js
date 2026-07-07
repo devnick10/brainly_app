@@ -1,3 +1,3 @@
 import baseConfig from '@brainly/eslint-config/base';
 
-export default baseConfig;
+export default [...baseConfig, { ignores: ['dist/'] }];

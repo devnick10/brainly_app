@@ -10,6 +10,22 @@ export function useGoogleSignIn(successMessage: string) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    function handleResponse(accessToken: string) {
+      setIsPending(true);
+      googleSignIn(accessToken)
+        .then((data) => {
+          localStorage.setItem(ACCESS_TOKEN_KEY, String(data.token));
+          toast.success(successMessage);
+          navigate('/dashboard');
+        })
+        .catch(() => {
+          toast.error('Google sign in failed');
+        })
+        .finally(() => {
+          setIsPending(false);
+        });
+    }
+
     if (window.google?.accounts?.oauth2) {
       googleClient.current = window.google.accounts.oauth2.initTokenClient({
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
@@ -25,23 +41,7 @@ export function useGoogleSignIn(successMessage: string) {
         },
       });
     }
-  }, [handleResponse]);
-
-  function handleResponse(accessToken: string) {
-    setIsPending(true);
-    googleSignIn(accessToken)
-      .then((data) => {
-        localStorage.setItem(ACCESS_TOKEN_KEY, String(data.token));
-        toast.success(successMessage);
-        navigate('/dashboard');
-      })
-      .catch(() => {
-        toast.error('Google sign in failed');
-      })
-      .finally(() => {
-        setIsPending(false);
-      });
-  }
+  }, [successMessage, navigate]);
 
   function signInWithGoogle() {
     googleClient.current?.requestAccessToken();
