@@ -12,10 +12,18 @@ const errorMiddleware = (): MiddlewareHandler => {
         console.error('[Middleware Catch]:', err);
       }
 
+      // 1. Manually intercept HTTPException instead of relying on err.getResponse()
       if (err instanceof HTTPException) {
-        return err.getResponse();
+        return c.json(
+          {
+            message: err.message,
+            cause: err.cause,
+          },
+          err.status,
+        );
       }
 
+      // 2. Generic fallback errors (500)
       const errorMessage = err instanceof Error ? err.message : 'Unknown Error';
       const errorBody = isProd
         ? { message: errorMessage }

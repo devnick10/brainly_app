@@ -3,7 +3,6 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { createMiddleware } from 'hono/factory';
 import { logger } from 'hono/logger';
-import errorMiddleware from './middlewares/globalError';
 import { brainRouter } from './routes/brain';
 import { userRouter } from './routes/user';
 import { AppContext } from './types';
@@ -12,7 +11,7 @@ const app = new Hono<AppContext>();
 
 // CORS MIDDLEWARE
 app.use(
-  '*',
+  '/api/*',
   cors({
     origin: (origin, c) => {
       // 1. Allow server-to-server or tool traffic that lacks an origin header
@@ -32,9 +31,6 @@ app.use(
   }),
 );
 
-// GLOBAL ERROR HANDLER
-app.use('/api/*', errorMiddleware());
-
 // PRISMA CLIENT MIDDLEWARE
 app.use(
   '/api/*',
@@ -51,7 +47,7 @@ app.use(logger());
 
 // HEALTH CHECK
 app.get('/', (c) => {
-  return c.text('Hello Hono!');
+  return c.text('App is up');
 });
 
 // APP ROUTES

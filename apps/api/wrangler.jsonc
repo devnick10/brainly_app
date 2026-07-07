@@ -43,9 +43,12 @@
   // }
   "secrets": {
     "required": [
-      "JWT_SECRET",
+      "ACCESS_TOKEN_SECRET",
+      "REFRESH_TOKEN_SECRET",
+      "ACCESS_TOKEN_EXPIRY",
+      "REFRESH_TOKEN_EXPIRY",
       "DATABASE_URL",
-      "ACCESS_ORIGIN",
+      "PROD_ACCESS_ORIGIN",
       "DEV_ACCESS_ORIGIN",
       "GOOGLE_CLIENT_ID",
       "NODE_ENV",

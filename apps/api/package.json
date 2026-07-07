@@ -16,6 +16,7 @@
     "@hono/zod-validator": "^0.8.0",
     "bcryptjs": "^3.0.3",
     "cheerio": "^1.2.0",
+    "cuid": "^3.0.0",
     "dotenv": "^17.4.2",
     "hono": "^4.12.26",
     "jose": "^6.2.3",

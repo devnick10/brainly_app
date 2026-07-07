@@ -6,8 +6,12 @@ import { zValidator } from '../middlewares/validator';
 import { CreateContentSchema, ShareLinkSchema } from '../schema/brainSchema';
 import { AppContext, SearchResult } from '../types';
 import { generateEmbedding } from '@brainly/ai';
+import errorMiddleware from '../middlewares/globalError';
 
 const brainRouter = new Hono<AppContext>();
+
+// GLOBAL ERROR HANDLER
+brainRouter.use('*', errorMiddleware());
 
 brainRouter.get('/search', authMiddleware, async (c) => {
   const prisma = c.get('prisma');

@@ -3,7 +3,10 @@ import type { ExtendedPrismaClient } from '@brainly/db';
 export type Bindings = {
   ACCESS_ORIGIN: string;
   DATABASE_URL: string;
-  JWT_SECRET: string;
+  REFRESH_TOKEN_SECRET: string;
+  ACCESS_TOKEN_SECRET: string;
+  REFRESH_TOKEN_EXPIRY: string;
+  ACCESS_TOKEN_EXPIRY: string;
   GOOGLE_CLIENT_ID: string;
   NODE_ENV: string;
   AI: Ai;

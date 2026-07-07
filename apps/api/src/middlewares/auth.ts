@@ -5,7 +5,9 @@ import { HTTPException } from 'hono/http-exception';
 
 export const authMiddleware = createMiddleware<AppContext>(async (c, next) => {
   const authHeader = c.req.header('Authorization');
-
+  if (!authHeader) {
+    throw new HTTPException(401, { message: 'Unauthorized' });
+  }
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
     try {
@@ -17,7 +19,13 @@ export const authMiddleware = createMiddleware<AppContext>(async (c, next) => {
         throw new HTTPException(401, { message: 'Unauthorized' });
       }
       c.set('userId', payload.id as string);
-    } catch {
+    } catch (error) {
+      if (error instanceof Error && error.name === 'JWTExpired') {
+        throw new HTTPException(401, {
+          message: 'Token expired',
+          cause: 'AUTH_TOKEN_EXPIRED',
+        });
+      }
       throw new HTTPException(401, { message: 'Unauthorized' });
     }
   }
