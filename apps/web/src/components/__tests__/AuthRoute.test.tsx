@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import AuthRoute from '../AuthRoute';
+import { ACCESS_TOKEN_KEY } from '@/lib/constants';
 
 beforeEach(() => {
   localStorage.clear();
@@ -21,7 +22,7 @@ describe('AuthRoute', () => {
   });
 
   it('redirects to dashboard when authenticated', () => {
-    localStorage.setItem('token', 'some-token');
+    localStorage.setItem(ACCESS_TOKEN_KEY, 'some-token');
     render(
       <MemoryRouter>
         <AuthRoute>

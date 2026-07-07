@@ -1,36 +1,36 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { apiClient } from '@/lib/axios';
 import { signupUser } from '../signupUser';
 
-const mockFetch = vi.fn() as unknown as typeof fetch;
-globalThis.fetch = mockFetch;
+vi.mock('@/lib/axios', () => ({
+  apiClient: {
+    post: vi.fn(),
+  },
+}));
+
+const mockedPost = vi.mocked(apiClient.post);
 
 beforeEach(() => {
-  mockFetch.mockReset();
+  mockedPost.mockReset();
 });
 
 describe('signupUser', () => {
-  const baseUrl = 'http://localhost:8787/api/v1';
-  vi.stubEnv('VITE_BASE_URL', baseUrl);
-
   it('sends email and password', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true, token: 'abc' }),
+    mockedPost.mockResolvedValueOnce({
+      data: { success: true, token: 'abc' },
     });
 
     const result = await signupUser({ email: 'a@b.com', password: '1234' });
 
-    expect(mockFetch).toHaveBeenCalledWith(`${baseUrl}/user/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email: 'a@b.com', password: '1234' }),
+    expect(mockedPost).toHaveBeenCalledWith('/user/signup', {
+      email: 'a@b.com',
+      password: '1234',
     });
     expect(result.token).toBe('abc');
   });
 
   it('throws on error', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: false });
+    mockedPost.mockRejectedValueOnce(new Error('Signup failed'));
 
     await expect(
       signupUser({ email: 'a@b.com', password: '1234' }),

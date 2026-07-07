@@ -1,39 +1,36 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { apiClient } from '@/lib/axios';
 import { getUser } from '../getUser';
+import { ACCESS_TOKEN_KEY } from '@/lib/constants';
 
-const mockFetch = vi.fn() as unknown as typeof fetch;
-globalThis.fetch = mockFetch;
+vi.mock('@/lib/axios', () => ({
+  apiClient: {
+    get: vi.fn(),
+  },
+}));
+
+const mockedGet = vi.mocked(apiClient.get);
 
 beforeEach(() => {
-  mockFetch.mockReset();
+  mockedGet.mockReset();
   localStorage.clear();
 });
 
 describe('getUser', () => {
-  const baseUrl = 'http://localhost:8787/api/v1';
-  vi.stubEnv('VITE_BASE_URL', baseUrl);
-
   it('sends auth header and returns user', async () => {
-    localStorage.setItem('token', 'my-jwt');
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        success: true,
-        user: { id: '1', email: 'a@b.com' },
-      }),
+    localStorage.setItem(ACCESS_TOKEN_KEY, 'my-jwt');
+    mockedGet.mockResolvedValueOnce({
+      data: { success: true, user: { id: '1', email: 'a@b.com' } },
     });
 
     const result = await getUser();
-    expect(mockFetch).toHaveBeenCalledWith(`${baseUrl}/user/me`, {
-      method: 'GET',
-      headers: { Authorization: 'Bearer my-jwt' },
-    });
+    expect(mockedGet).toHaveBeenCalledWith('/user/me');
     expect(result.user.email).toBe('a@b.com');
   });
 
   it('throws when not authenticated', async () => {
-    localStorage.setItem('token', 'bad');
-    mockFetch.mockResolvedValueOnce({ ok: false });
+    localStorage.setItem(ACCESS_TOKEN_KEY, 'bad');
+    mockedGet.mockRejectedValueOnce(new Error('Failed to fetch user'));
 
     await expect(getUser()).rejects.toThrow('Failed to fetch user');
   });
