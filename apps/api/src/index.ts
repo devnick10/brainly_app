@@ -3,6 +3,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { createMiddleware } from 'hono/factory';
 import { logger } from 'hono/logger';
+import { secureHeaders } from './middlewares/secureHeaders';
 import { brainRouter } from './routes/brain';
 import { userRouter } from './routes/user';
 import { AppContext } from './types';
@@ -41,6 +42,9 @@ app.use(
     await prisma.$disconnect();
   }),
 );
+
+// SECURITY HEADERS
+app.use('/*', secureHeaders);
 
 // LOGGER
 app.use(logger());
