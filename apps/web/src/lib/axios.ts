@@ -73,7 +73,7 @@ apiClient.interceptors.response.use(
 
           // Refresh token is also expired or invalid -> Logout user
           localStorage.clear();
-          window.location.href = '/login';
+          window.location.href = '/signin';
           return Promise.reject(refreshError);
         } finally {
           isRefreshing = false;
@@ -81,7 +81,7 @@ apiClient.interceptors.response.use(
       } else {
         // 6. It's a 401 but NOT an expired error (e.g., completely invalid or missing token)
         localStorage.clear();
-        window.location.href = '/login';
+        window.location.href = '/signin';
       }
     }
 

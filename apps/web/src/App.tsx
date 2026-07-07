@@ -10,6 +10,7 @@ const Signin = lazy(() => import('./pages/Signin'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const AuthRoute = lazy(() => import('./components/AuthRoute'));
 const PrivateRoute = lazy(() => import('./components/PrivateRoute'));
+const NotFound = lazy(() => import('./pages/NotFound.tsx'));
 
 const queryClient = new QueryClient();
 function App() {
@@ -51,6 +52,7 @@ function App() {
             }
           />
           <Route path="/brain/:hash" element={<SharedDashboard />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>
