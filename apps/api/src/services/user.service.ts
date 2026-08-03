@@ -7,7 +7,7 @@ export async function getUserById(
 ) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    omit: { password: true },
+    omit: { password: true, googleId: true },
   });
 
   if (!user) {

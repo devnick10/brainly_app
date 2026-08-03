@@ -7,7 +7,8 @@ import { secureHeaders } from './middlewares/secureHeaders';
 import { brainRouter } from './routes/brain';
 import { userRouter } from './routes/user';
 import { AppContext } from './types';
-
+import { createRateLimit } from './middlewares/rate-limiter';
+export { RateLimiter } from './durable-object/RateLimite';
 const app = new Hono<AppContext>();
 
 // CORS MIDDLEWARE
@@ -31,6 +32,9 @@ app.use(
     credentials: true,
   }),
 );
+
+// Global rate limiting middleware
+app.use('/api/*', createRateLimit());
 
 // PRISMA CLIENT MIDDLEWARE
 app.use(

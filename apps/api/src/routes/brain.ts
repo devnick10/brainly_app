@@ -7,36 +7,42 @@ import { AppContext } from '../types';
 import { success, error } from '../lib/response';
 import { onError } from '../middlewares/globalError';
 import * as contentService from '../services/content.service';
+import { createRateLimit } from '../middlewares/rate-limiter';
 
 const brainRouter = new Hono<AppContext>();
 
 brainRouter.onError(onError);
 
-brainRouter.get('/search', authMiddleware, async (c) => {
-  const rawQuery = c.req.query('q')?.trim();
-  if (!rawQuery || rawQuery.length < 2) {
-    return success(c, { content: [] });
-  }
+brainRouter.get(
+  '/search',
+  createRateLimit(30, 60),
+  authMiddleware,
+  async (c) => {
+    const rawQuery = c.req.query('q')?.trim();
+    if (!rawQuery || rawQuery.length < 2) {
+      return success(c, { content: [] });
+    }
 
-  const query = rawQuery.replace(/[^\x20-\x7E\s]/g, '');
+    const query = rawQuery.replace(/[^\x20-\x7E\s]/g, '');
 
-  try {
-    const prisma = c.get('prisma');
-    const userId = c.get('userId');
+    try {
+      const prisma = c.get('prisma');
+      const userId = c.get('userId');
 
-    const results = await contentService.searchContent(
-      prisma,
-      userId,
-      query,
-      c.env.AI,
-    );
+      const results = await contentService.searchContent(
+        prisma,
+        userId,
+        query,
+        c.env.AI,
+      );
 
-    return success(c, { content: results });
-  } catch (error) {
-    console.error(error);
-    throw new HTTPException(500, { message: 'Failed to search content.' });
-  }
-});
+      return success(c, { content: results });
+    } catch (error) {
+      console.error(error);
+      throw new HTTPException(500, { message: 'Failed to search content.' });
+    }
+  },
+);
 
 brainRouter.get('/', authMiddleware, async (c) => {
   try {
@@ -54,6 +60,7 @@ brainRouter.get('/', authMiddleware, async (c) => {
 
 brainRouter.post(
   '/',
+  createRateLimit(10, 60),
   zValidator('json', CreateContentSchema),
   authMiddleware,
   async (c) => {
