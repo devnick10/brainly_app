@@ -1,6 +1,15 @@
 import type { ExtendedPrismaClient } from '@brainly/db';
 import { vi } from 'vitest';
 
+const mockRateLimiterStub = {
+  fetch: vi.fn().mockResolvedValue(new Response('OK')),
+};
+
+export const mockRateLimiter = {
+  idFromName: vi.fn(() => ({ toString: () => 'mock-rate-limit-id' })),
+  get: vi.fn(() => mockRateLimiterStub),
+};
+
 export const mockEnv = {
   ACCESS_ORIGIN: '*',
   DEV_ACCESS_ORIGIN: 'http://localhost:5173',
@@ -13,6 +22,7 @@ export const mockEnv = {
   NODE_ENV: 'test',
   AI: { run: vi.fn() } as unknown as Ai,
   CONTENT_QUEUE: { send: vi.fn() } as unknown as Queue,
+  RATE_LIMITER: mockRateLimiter as unknown as DurableObjectNamespace,
 };
 
 const createMockPrisma = () =>
