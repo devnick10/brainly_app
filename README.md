@@ -104,6 +104,53 @@ The application is built on Cloudflare's edge platform using an event-driven arc
 
 ![Authentication Architecture](https://res.cloudinary.com/dnr1sgjrx/image/upload/v1783442681/brainly/auth__arch_ps7hei.png)
 
+---
+
+# Rate Limiting
+
+Brainly uses **Cloudflare Durable Objects** to implement distributed, edge-native rate limiting for authentication and API endpoints.
+
+Instead of relying on Redis or another centralized datastore, each client (identified by an IP address or user ID) is deterministically mapped to a dedicated Durable Object instance using `idFromName()`. Each Durable Object maintains its own request counter and time window, enabling atomic updates and consistent rate limiting across Cloudflare's global edge network.
+
+This approach provides:
+
+- Edge-native request limiting with low latency
+- Atomic request counting without race conditions
+- No external infrastructure (Redis) required
+- Independent rate limits per client
+- Horizontally scalable architecture
+
+```text
+Incoming Request
+        │
+        ▼
+Rate Limit Middleware
+        │
+Extract Client Key
+(IP / User ID)
+        │
+        ▼
+idFromName(clientKey)
+        │
+        ▼
+Durable Object
+        │
+Read Counter & Window
+        │
+Increment Counter
+        │
+        ▼
+Limit Exceeded?
+     ┌─────┴─────┐
+     │           │
+    No          Yes
+     │           │
+     ▼           ▼
+Continue      HTTP 429
+```
+
+---
+
 # Repository Structure
 
 ```text
