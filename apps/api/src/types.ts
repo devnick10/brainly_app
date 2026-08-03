@@ -1,4 +1,5 @@
 import type { ExtendedPrismaClient } from '@brainly/db';
+import { RateLimiter } from './durable-object/RateLimite';
 
 export type Bindings = {
   ACCESS_ORIGIN: string;
@@ -9,12 +10,14 @@ export type Bindings = {
   ACCESS_TOKEN_EXPIRY: string;
   GOOGLE_CLIENT_ID: string;
   NODE_ENV: string;
+
   AI: Ai;
   CONTENT_QUEUE: Queue;
+  RATE_LIMITER: DurableObjectNamespace<RateLimiter>;
 };
 
 export type AppContext = {
-  Bindings: Bindings;
+  Bindings: Env;
   Variables: {
     prisma: ExtendedPrismaClient;
     userId: string;

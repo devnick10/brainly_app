@@ -3,7 +3,7 @@ export interface AIBinding {
     model: string,
     inputs: {
       text: string[];
-    }
+    },
   ): Promise<{
     data: number[][];
   }>;

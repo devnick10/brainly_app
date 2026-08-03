@@ -1,90 +1,113 @@
 import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
 import { getCookie, setCookie } from 'hono/cookie';
+import { HTTPException } from 'hono/http-exception';
 import { jwtVerify } from 'jose';
 import { JOSEError, JWTExpired } from 'jose/errors';
+import { success } from '../lib/response';
 import { createSession } from '../lib/session';
 import { authMiddleware } from '../middlewares/auth';
+import { onError } from '../middlewares/globalError';
+import { createRateLimit } from '../middlewares/rate-limiter';
 import { zValidator } from '../middlewares/validator';
 import { googleSchema, signinSchema, signupSchema } from '../schema/userSchema';
-import { AppContext } from '../types';
-import { success } from '../lib/response';
-import { onError } from '../middlewares/globalError';
 import * as authService from '../services/auth.service';
 import * as userService from '../services/user.service';
-
+import { AppContext } from '../types';
 const userRouter = new Hono<AppContext>();
 
 userRouter.onError(onError);
 
-userRouter.post('/signup', zValidator('json', signupSchema), async (c) => {
-  try {
-    const { email, password } = c.req.valid('json');
-    const prisma = c.get('prisma');
+userRouter.post(
+  '/signup',
+  createRateLimit(5, 60),
+  zValidator('json', signupSchema),
+  async (c) => {
+    try {
+      const { email, password } = c.req.valid('json');
+      const prisma = c.get('prisma');
 
-    const { userId } = await authService.signup(prisma, email, password);
-    const { accessToken } = await createSession(c, userId);
+      const { userId } = await authService.signup(prisma, email, password);
+      const { accessToken } = await createSession(c, userId);
 
-    return success(c, { message: 'Signup successfully.', token: accessToken });
-  } catch (error) {
-    if (error instanceof HTTPException) throw error;
-    console.error(error);
-    throw new HTTPException(500, { message: 'Internal server error' });
-  }
-});
+      return success(c, {
+        message: 'Signup successfully.',
+        token: accessToken,
+      });
+    } catch (error) {
+      if (error instanceof HTTPException) throw error;
+      console.error(error);
+      throw new HTTPException(500, { message: 'Internal server error' });
+    }
+  },
+);
 
-userRouter.post('/signin', zValidator('json', signinSchema), async (c) => {
-  try {
-    const { email, password } = c.req.valid('json');
-    const prisma = c.get('prisma');
+userRouter.post(
+  '/signin',
+  createRateLimit(10, 60),
+  zValidator('json', signinSchema),
+  async (c) => {
+    try {
+      const { email, password } = c.req.valid('json');
+      const prisma = c.get('prisma');
 
-    const { userId } = await authService.signin(prisma, email, password);
-    const { accessToken } = await createSession(c, userId);
+      const { userId } = await authService.signin(prisma, email, password);
+      const { accessToken } = await createSession(c, userId);
 
-    return success(c, { message: 'Signin successfully', token: accessToken });
-  } catch (error) {
-    if (error instanceof HTTPException) throw error;
-    console.error(error);
-    throw new HTTPException(500, { message: 'Internal server error' });
-  }
-});
+      return success(c, { message: 'Signin successfully', token: accessToken });
+    } catch (error) {
+      if (error instanceof HTTPException) throw error;
+      console.error(error);
+      throw new HTTPException(500, { message: 'Internal server error' });
+    }
+  },
+);
 
-userRouter.post('/google', zValidator('json', googleSchema), async (c) => {
-  try {
-    const { credential } = c.req.valid('json');
-    const prisma = c.get('prisma');
+userRouter.post(
+  '/google',
+  createRateLimit(5, 60),
+  zValidator('json', googleSchema),
+  async (c) => {
+    try {
+      const { credential } = c.req.valid('json');
+      const prisma = c.get('prisma');
 
-    const { userId, isExisting } = await authService.googleAuth(
-      prisma,
-      credential,
-    );
-    const { accessToken } = await createSession(c, userId);
+      const { userId, isExisting } = await authService.googleAuth(
+        prisma,
+        credential,
+      );
+      const { accessToken } = await createSession(c, userId);
 
-    return success(c, {
-      message: isExisting
-        ? 'Signed in with Google successfully'
-        : 'Signed up with Google successfully',
-      token: accessToken,
-    });
-  } catch (error) {
-    console.error(error);
-    throw new HTTPException(500, { message: 'Google authentication failed' });
-  }
-});
+      return success(c, {
+        message: isExisting
+          ? 'Signed in with Google successfully'
+          : 'Signed up with Google successfully',
+        token: accessToken,
+      });
+    } catch (error) {
+      console.error(error);
+      throw new HTTPException(500, { message: 'Google authentication failed' });
+    }
+  },
+);
 
-userRouter.post('/reset', zValidator('json', signinSchema), async (c) => {
-  try {
-    const { email, password } = c.req.valid('json');
-    const prisma = c.get('prisma');
+userRouter.post(
+  '/reset',
+  createRateLimit(3, 60),
+  zValidator('json', signinSchema),
+  async (c) => {
+    try {
+      const { email, password } = c.req.valid('json');
+      const prisma = c.get('prisma');
 
-    await authService.resetPassword(prisma, email, password);
+      await authService.resetPassword(prisma, email, password);
 
-    return success(c, { message: 'Password updated successfully' });
-  } catch (error) {
-    if (error instanceof HTTPException) throw error;
-    throw new HTTPException(500, { message: 'Internal server error' });
-  }
-});
+      return success(c, { message: 'Password updated successfully' });
+    } catch (error) {
+      if (error instanceof HTTPException) throw error;
+      throw new HTTPException(500, { message: 'Internal server error' });
+    }
+  },
+);
 
 userRouter.get('/me', authMiddleware, async (c) => {
   try {
@@ -101,34 +124,39 @@ userRouter.get('/me', authMiddleware, async (c) => {
   }
 });
 
-userRouter.post('/logout', authMiddleware, async (c) => {
-  try {
-    const prisma = c.get('prisma');
-    const incomingRefreshToken = getCookie(c, 'refreshToken');
-    let sessionId: string | undefined;
+userRouter.post(
+  '/logout',
+  createRateLimit(10, 60),
+  authMiddleware,
+  async (c) => {
+    try {
+      const prisma = c.get('prisma');
+      const incomingRefreshToken = getCookie(c, 'refreshToken');
+      let sessionId: string | undefined;
 
-    if (incomingRefreshToken) {
-      try {
-        const { payload } = await jwtVerify(
-          incomingRefreshToken,
-          new TextEncoder().encode(c.env.REFRESH_TOKEN_SECRET),
-        );
-        sessionId = payload.sid as string;
-      } catch {
-        // Token invalid or expired — best-effort revocation
+      if (incomingRefreshToken) {
+        try {
+          const { payload } = await jwtVerify(
+            incomingRefreshToken,
+            new TextEncoder().encode(c.env.REFRESH_TOKEN_SECRET),
+          );
+          sessionId = payload.sid as string;
+        } catch {
+          // Token invalid or expired — best-effort revocation
+        }
       }
+
+      await authService.logout(prisma, sessionId);
+
+      setCookie(c, 'refreshToken', '', { maxAge: 0, path: '/' });
+
+      return success(c, { message: 'Logged out successfully' });
+    } catch (error) {
+      console.error(error);
+      throw new HTTPException(500, { message: 'Failed to logout' });
     }
-
-    await authService.logout(prisma, sessionId);
-
-    setCookie(c, 'refreshToken', '', { maxAge: 0, path: '/' });
-
-    return success(c, { message: 'Logged out successfully' });
-  } catch (error) {
-    console.error(error);
-    throw new HTTPException(500, { message: 'Failed to logout' });
-  }
-});
+  },
+);
 
 userRouter.post('/refresh', async (c) => {
   const prisma = c.get('prisma');
