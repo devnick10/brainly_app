@@ -110,15 +110,21 @@ The application is built on Cloudflare's edge platform using an event-driven arc
 
 Brainly uses **Cloudflare Durable Objects** to implement distributed, edge-native rate limiting for authentication and API endpoints.
 
-Instead of relying on Redis or another centralized datastore, each client (identified by an IP address or user ID) is deterministically mapped to a dedicated Durable Object instance using `idFromName()`. Each Durable Object maintains its own request counter and time window, enabling atomic updates and consistent rate limiting across Cloudflare's global edge network.
+Instead of relying on Redis or another centralized datastore, each client (identified by an IP address or user ID) is deterministically mapped to a dedicated Durable Object instance using `idFromName()`. Each Durable Object maintains its own request history and time window, enabling atomic updates and consistent rate limiting across Cloudflare's global edge network.
+
+The algorithm is a **sliding window**: each object stores the requests it has seen bucketed per second (`Record<epochSecond, count>`), and on every request it sums the buckets inside the trailing window, discards the ones that just fell out, and allows the request only if there is room. Because the window advances one second per request rather than resetting on a fixed boundary, a client cannot spend its whole budget twice by straddling a boundary — the failure mode of a fixed window counter.
+
+Durable Objects are single threaded and handle one request at a time per object, so the read-sum-write is already atomic and needs no locking.
 
 This approach provides:
 
 - Edge-native request limiting with low latency
+- Accurate limiting with no fixed-window boundary burst
 - Atomic request counting without race conditions
 - No external infrastructure (Redis) required
 - Independent rate limits per client
 - Horizontally scalable architecture
+- `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` and `Retry-After` response headers
 
 ```text
 Incoming Request
@@ -126,8 +132,8 @@ Incoming Request
         ▼
 Rate Limit Middleware
         │
-Extract Client Key
-(IP / User ID)
+        Extract Client Key
+        (IP / User ID)
         │
         ▼
 idFromName(clientKey)
@@ -135,19 +141,24 @@ idFromName(clientKey)
         ▼
 Durable Object
         │
-Read Counter & Window
+        Read Buckets
         │
-Increment Counter
+        Sum Buckets In
+        Trailing Window
         │
-        ▼
-Limit Exceeded?
+        Prune Expired
+        │
+        Under Limit?
      ┌─────┴─────┐
      │           │
     No          Yes
      │           │
      ▼           ▼
-Continue      HTTP 429
+ Register     Continue
+ Request
 ```
+
+The decision logic lives in `apps/api/src/lib/sliding-window.ts` as a pure function so it can be unit tested without the Workers runtime.
 
 ---
 

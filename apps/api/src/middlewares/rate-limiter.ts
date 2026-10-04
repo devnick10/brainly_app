@@ -3,6 +3,14 @@ import { createMiddleware } from 'hono/factory';
 import { AppContext } from '../types';
 const RATE_LIMIT_WINDOW = 60; // 1 minute
 const RATE_LIMIT_MAX_REQUESTS = 60; // 60 requests/minute/IP
+
+const FORWARDED_HEADERS = [
+  'X-RateLimit-Limit',
+  'X-RateLimit-Remaining',
+  'X-RateLimit-Reset',
+  'Retry-After',
+] as const;
+
 interface RateLimitPayload {
   key: (c: Context<AppContext>) => string;
   limit: number;
@@ -25,6 +33,14 @@ export const rateLimit = ({ key, limit, window }: RateLimitPayload) =>
         window,
       }),
     });
+
+    /** Let the client see its own budget so it can back off before hitting 429 */
+
+    for (const header of FORWARDED_HEADERS) {
+      const value = res.headers.get(header);
+
+      if (value !== null) c.header(header, value);
+    }
 
     if (!res.ok) {
       return c.json({ message: 'Too many requests' }, 429);
