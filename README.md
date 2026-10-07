@@ -27,9 +27,10 @@ The application is built on Cloudflare's edge platform using an event-driven arc
 
 ## Frontend
 
-- Next.js
+- React + Vite
 - TypeScript
 - TanStack Query
+- React Router DOM
 - Tailwind CSS
 - shadcn/ui
 - Lucide React
@@ -313,7 +314,7 @@ DATABASE_URL=
 ### Frontend
 
 ```env
-NEXT_PUBLIC_API_URL=
+VITE_API_URL=
 ```
 
 ---
